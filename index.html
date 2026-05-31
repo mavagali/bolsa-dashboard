@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BolsaVision - Dashboard de Mercados Financieros</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232979ff'%3E%3Cpath d='M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.09-4-4L2 16.08l1.5 2.41z'/%3E%3C/svg%3E">
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- TradingView Widget Library (tv.js) -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js" defer></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="logo-icon">
+                    <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.09-4-4L2 16.08l1.5 2.41z" />
+                </svg>
+                <div class="logo-text">
+                    <h1>Bolsa<span>Vision</span></h1>
+                    <span class="tagline">Terminal de Índices Globales</span>
+                </div>
+            </div>
+            
+            <!-- Clocks Component -->
+            <div class="market-clocks">
+                <div class="clock-item" id="clock-madrid">
+                    <div class="clock-status">
+                        <span class="status-dot"></span>
+                        <span class="clock-label">Madrid (IBEX)</span>
+                    </div>
+                    <span class="clock-time">00:00:00</span>
+                </div>
+                <div class="clock-item" id="clock-london">
+                    <div class="clock-status">
+                        <span class="status-dot"></span>
+                        <span class="clock-label">Londres (FTSE)</span>
+                    </div>
+                    <span class="clock-time">00:00:00</span>
+                </div>
+                <div class="clock-item" id="clock-newyork">
+                    <div class="clock-status">
+                        <span class="status-dot"></span>
+                        <span class="clock-label">Nueva York (NYSE)</span>
+                    </div>
+                    <span class="clock-time">00:00:00</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TICKER TAPE -->
+        <div class="ticker-tape-wrapper">
+            <div id="tradingview-ticker-tape"></div>
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <div class="main-layout">
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="section-title">Navegación</h3>
+                    <nav class="sidebar-nav">
+                        <button class="nav-btn active" data-view="overview" id="btn-overview">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M10 20H5v-7H2v-2h3V3h2v8h3v2H7v7h3v2zm12-9h-5v7h-2v2h2v1h2v-1h3v-2h-3v-7zm-5-8h2v5h-2V3z"/>
+                            </svg>
+                            <span>Visión General</span>
+                        </button>
+                        <button class="nav-btn" data-view="spain" id="btn-spain">
+                            <span class="flag-icon">🇪🇸</span>
+                            <span>Bolsa Española</span>
+                        </button>
+                        <button class="nav-btn" data-view="europe" id="btn-europe">
+                            <span class="flag-icon">🇪🇺</span>
+                            <span>Bolsas Europeas</span>
+                        </button>
+                        <button class="nav-btn" data-view="america" id="btn-america">
+                            <span class="flag-icon">🇺🇸</span>
+                            <span>Bolsas Americanas</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- DYNAMIC ASSET LIST -->
+                <div class="sidebar-section">
+                    <h3 class="section-title" id="asset-list-title">Índices y Acciones</h3>
+                    <div class="asset-list" id="asset-list">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CONTENT PANEL -->
+            <main class="content-panel">
+                <!-- VIEW 1: OVERVIEW -->
+                <div class="view-container active" id="view-overview">
+                    <div class="overview-grid">
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇪🇸</span>
+                                <h4>IBEX 35</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-ibex"></div>
+                        </div>
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇪🇺</span>
+                                <h4>EURO STOXX 50</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-stoxx"></div>
+                        </div>
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇩🇪</span>
+                                <h4>DAX 40</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-dax"></div>
+                        </div>
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇺🇸</span>
+                                <h4>S&P 500</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-spx"></div>
+                        </div>
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇺🇸</span>
+                                <h4>NASDAQ 100</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-nasdaq"></div>
+                        </div>
+                        <div class="grid-card mini-chart-card">
+                            <div class="card-header">
+                                <span class="flag">🇬🇧</span>
+                                <h4>FTSE 100</h4>
+                            </div>
+                            <div class="mini-chart-container" id="mini-ftse"></div>
+                        </div>
+                    </div>
+
+                    <!-- Market Feed Widgets -->
+                    <div class="overview-widgets">
+                        <div class="grid-card news-card">
+                            <div class="card-header border-bottom">
+                                <h4>Noticias de Mercados en Tiempo Real</h4>
+                            </div>
+                            <div class="news-widget-container" id="news-timeline-container">
+                                <!-- Dynamic TradingView News Timeline -->
+                            </div>
+                        </div>
+                        <div class="grid-card calendar-card">
+                            <div class="card-header border-bottom">
+                                <h4>Calendario Económico</h4>
+                            </div>
+                            <div class="calendar-widget-container" id="economic-calendar-container">
+                                <!-- Dynamic TradingView Economic Calendar -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: TERMINAL (DETAIL) -->
+                <div class="view-container" id="view-terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-title-area">
+                            <span class="active-flag" id="active-symbol-flag">🇪🇸</span>
+                            <h2 id="active-symbol-title">IBEX 35</h2>
+                            <span class="active-ticker" id="active-symbol-ticker">TVC:IBEX35</span>
+                        </div>
+                        <div class="terminal-actions">
+                            <button class="btn btn-primary" id="btn-back-overview">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" style="margin-right: 6px;">
+                                    <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                                </svg>
+                                Volver a Visión General
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="terminal-grid">
+                        <!-- Chart block -->
+                        <div class="grid-card chart-card">
+                            <div id="tradingview_chart_container">
+                                <div id="tradingview_chart"></div>
+                            </div>
+                        </div>
+
+                        <!-- Side details block -->
+                        <div class="terminal-details-sidebar">
+                            <!-- Technical Gauge -->
+                            <div class="grid-card gauge-card">
+                                <div class="card-header border-bottom">
+                                    <h4>Análisis Técnico</h4>
+                                </div>
+                                <div class="gauge-container" id="technical-analysis-container">
+                                    <!-- Dynamic Technical Gauge -->
+                                </div>
+                            </div>
+
+                            <!-- Symbol Profile -->
+                            <div class="grid-card info-card">
+                                <div class="card-header border-bottom">
+                                    <h4>Detalles del Símbolo</h4>
+                                </div>
+                                <div class="info-widget-container" id="symbol-info-container">
+                                    <!-- Dynamic Symbol Info -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <p>&copy; 2026 BolsaVision. Todos los datos están en tiempo real o con ligeros retrasos proporcionados por TradingView.</p>
+            <p class="footer-github">Listo para hospedar en <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></p>
+        </footer>
+    </div>
+
+    <!-- Main JavaScript Logic -->
+    <script src="app.js" defer></script>
+</body>
+</html>
