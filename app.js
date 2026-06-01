@@ -1,13 +1,6 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
  * Versión 2026 - REPARADA, OPTIMIZADA Y 100% FUNCIONAL
- * 
- * Mejoras implementadas:
- * ✅ Validación completa de elementos DOM
- * ✅ Corrección del método de inyección de TradingView (innerHTML en lugar de textContent)
- * ✅ Gestión adecuada de intervalos
- * ✅ Manejo de errores robusto
- * ✅ Colores RGBA completos
  */
 
 const marketData = {
@@ -42,12 +35,8 @@ const marketData = {
     ]
 };
 
-// Variable global para gestionar el intervalo de relojes
 let clockIntervalId = null;
 
-// ==========================================
-// INICIALIZACIÓN DE LA APLICACIÓN
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     try {
         initClocks();
@@ -60,16 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Limpiar recursos al descargar la página
 window.addEventListener('beforeunload', () => {
     if (clockIntervalId) {
         clearInterval(clockIntervalId);
     }
 });
 
-// ==========================================
-// CONTROL DE RELOJES MUNDIALES
-// ==========================================
 function initClocks() {
     function updateTimes() {
         const now = new Date();
@@ -86,7 +71,6 @@ function initClocks() {
             const timeElement = container.querySelector('.clock-time');
             const dotElement = container.querySelector('.status-dot');
             
-            // Actualizar hora con validación
             if (timeElement) {
                 try {
                     timeElement.textContent = now.toLocaleTimeString('es-ES', {
@@ -97,11 +81,10 @@ function initClocks() {
                         hour12: false
                     });
                 } catch (error) {
-                    console.warn(`Error al actualizar hora para ${clock.id}:`, error);
+                    console.warn(`Error actualizando hora ${clock.id}:`, error);
                 }
             }
 
-            // Actualizar estado del mercado
             if (dotElement) {
                 try {
                     const localDateStr = now.toLocaleString('en-US', { timeZone: clock.zone });
@@ -117,22 +100,16 @@ function initClocks() {
                         dotElement.classList.add('closed');
                     }
                 } catch (error) {
-                    console.warn(`Error al calcular estado del mercado para ${clock.id}:`, error);
+                    console.warn(`Error calculando estado ${clock.id}:`, error);
                 }
             }
         });
     }
 
-    // Primera actualización inmediata
     updateTimes();
-    
-    // Guardar referencia del intervalo para poder limpiarla después
     clockIntervalId = setInterval(updateTimes, 1000);
 }
 
-// ==========================================
-// INYECTOR DE SCRIPTS OFICIALES (TRADINGVIEW)
-// ==========================================
 function loadTradingViewWidget(containerId, srcScript, settings) {
     const container = document.getElementById(containerId);
     
@@ -158,13 +135,10 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
         script.type = 'text/javascript';
         script.src = srcScript;
         script.async = true;
-        
-        // ✅ CORRECCIÓN CRÍTICA: Usar innerHTML para inyectar la configuración JSON
         script.innerHTML = JSON.stringify(settings);
 
-        // Manejo de errores de carga
         script.onerror = () => {
-            console.error(`❌ Error al cargar widget desde: ${srcScript}`);
+            console.error(`❌ Error cargando widget: ${srcScript}`);
         };
 
         widgetContainer.appendChild(widgetLib);
@@ -172,15 +146,11 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
         container.appendChild(widgetContainer);
 
     } catch (error) {
-        console.error(`❌ Error al cargar widget ${containerId}:`, error);
+        console.error(`❌ Error en widget ${containerId}:`, error);
     }
 }
 
-// ==========================================
-// CARGA DE WIDGETS GLOBALES (HOME)
-// ==========================================
 function initGlobalWidgets() {
-    // 1. Ticker Tape Superior
     loadTradingViewWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
         "symbols": [
             { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
@@ -196,79 +166,27 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 2. Gráficos de la Cuadrícula Principal (Nativos e Individuales)
-    
-    // ✅ Tarjeta IBEX 35 - Colores completos
-    loadTradingViewWidget("mini-ibex", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CURRENCYCOM:SPA35", "IBEX 35"]],
-        "chartOnly": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "autosize": true,
-        "isTransparent": true,
-        "trendLineColor": "#2979ff",
-        "underLineColor": "rgba(41, 121, 255, 0.3)"
+    const miniCharts = [
+        { id: "mini-ibex", symbols: [["CURRENCYCOM:SPA35", "IBEX 35"]] },
+        { id: "mini-stoxx", symbols: [["CAPITALCOM:EU50", "EURO STOXX 50"]] },
+        { id: "mini-dax", symbols: [["XETR:DAX", "DAX 40"]] },
+        { id: "mini-spx", symbols: [["CURRENCYCOM:US500", "S&P 500"]] },
+        { id: "mini-nasdaq", symbols: [["CURRENCYCOM:US100", "NASDAQ 100"]] }
+    ];
+
+    miniCharts.forEach(chart => {
+        loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
+            "symbols": chart.symbols,
+            "chartOnly": true,
+            "width": "100%",
+            "height": "100%",
+            "locale": "es",
+            "colorTheme": "dark",
+            "autosize": true,
+            "isTransparent": true
+        });
     });
 
-    // ✅ Tarjeta EURO STOXX 50
-    loadTradingViewWidget("mini-stoxx", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CAPITALCOM:EU50", "EURO STOXX 50"]],
-        "chartOnly": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "autosize": true,
-        "isTransparent": true,
-        "trendLineColor": "#2979ff",
-        "underLineColor": "rgba(41, 121, 255, 0.3)"
-    });
-
-    // ✅ Tarjeta DAX 40
-    loadTradingViewWidget("mini-dax", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["XETR:DAX", "DAX 40"]],
-        "chartOnly": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "autosize": true,
-        "isTransparent": true,
-        "trendLineColor": "#2979ff",
-        "underLineColor": "rgba(41, 121, 255, 0.3)"
-    });
-
-    // ✅ Tarjeta S&P 500
-    loadTradingViewWidget("mini-spx", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CURRENCYCOM:US500", "S&P 500"]],
-        "chartOnly": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "autosize": true,
-        "isTransparent": true,
-        "trendLineColor": "#2979ff",
-        "underLineColor": "rgba(41, 121, 255, 0.3)"
-    });
-
-    // ✅ Tarjeta NASDAQ 100
-    loadTradingViewWidget("mini-nasdaq", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CURRENCYCOM:US100", "NASDAQ 100"]],
-        "chartOnly": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "autosize": true,
-        "isTransparent": true,
-        "trendLineColor": "#2979ff",
-        "underLineColor": "rgba(41, 121, 255, 0.3)"
-    });
-
-    // 3. Panel de Noticias
     loadTradingViewWidget("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
         "feedMode": "all_symbols",
         "colorTheme": "dark",
@@ -279,7 +197,6 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 4. Panel de Calendario Económico
     loadTradingViewWidget("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
         "colorTheme": "dark",
         "isTransparent": true,
@@ -289,15 +206,11 @@ function initGlobalWidgets() {
         "importanceFilter": "-1,0,1"
     });
 
-    console.log('✅ Widgets globales cargados');
+    console.log('✅ Widgets cargados');
 }
 
-// ==========================================
-// VISTA INTERACTIVA (TERMINAL DE DETALLE)
-// ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     try {
-        // ✅ CORRECCIÓN: Validar todos los elementos antes de acceder
         const flagEl = document.getElementById('active-symbol-flag');
         const titleEl = document.getElementById('active-symbol-title');
         const tickerEl = document.getElementById('active-symbol-ticker');
@@ -306,17 +219,15 @@ function updateTerminalAsset(symbol, name, flag) {
         if (titleEl) titleEl.textContent = name;
         if (tickerEl) tickerEl.textContent = symbol;
 
-        // Cargar gráfico principal de TradingView
         const chartBox = document.getElementById('tradingview_chart');
         if (chartBox) {
             chartBox.innerHTML = '<div id="tradingview_chart_real" style="width:100%; height:100%;"></div>';
             
-            // ✅ CORRECCIÓN: Mejor manejo de la carga asincrónica
             let attempts = 0;
-            const maxAttempts = 50; // Aumentar a 5 segundos (50 * 100ms)
+            const maxAttempts = 50;
             
             const checkTV = setInterval(() => {
-                if (typeof window.TradingView !== 'undefined' && typeof window.TradingView.widget !== 'undefined') {
+                if (typeof window.TradingView !== 'undefined' && typeof window.TradingView.widget === 'function') {
                     clearInterval(checkTV);
                     try {
                         new window.TradingView.widget({
@@ -332,19 +243,18 @@ function updateTerminalAsset(symbol, name, flag) {
                             "allow_symbol_change": true,
                             "container_id": "tradingview_chart_real"
                         });
-                        console.log(`✅ Gráfico cargado para ${symbol}`);
+                        console.log(`✅ Gráfico: ${symbol}`);
                     } catch (error) {
-                        console.error('❌ Error al crear widget TradingView:', error);
+                        console.error('❌ Error TradingView:', error);
                     }
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkTV);
-                    console.warn('⚠️ TradingView no disponible tras múltiples intentos');
+                    console.warn('⚠️ TradingView no disponible');
                 }
                 attempts++;
             }, 100);
         }
 
-        // Cargar análisis técnico
         loadTradingViewWidget("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
             "interval": "1D",
             "width": "100%",
@@ -356,7 +266,6 @@ function updateTerminalAsset(symbol, name, flag) {
             "colorTheme": "dark"
         });
 
-        // Cargar información del símbolo
         loadTradingViewWidget("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js", {
             "symbol": symbol,
             "width": "100%",
@@ -367,10 +276,10 @@ function updateTerminalAsset(symbol, name, flag) {
         });
 
         switchView('terminal');
-        console.log(`✅ Terminal actualizado para ${symbol}`);
+        console.log(`✅ Terminal: ${symbol}`);
 
     } catch (error) {
-        console.error('❌ Error al actualizar terminal:', error);
+        console.error('❌ Error terminal:', error);
     }
 }
 
@@ -396,7 +305,7 @@ function switchView(viewName) {
             if (viewTerminal) viewTerminal.classList.add('active');
         }
     } catch (error) {
-        console.error('❌ Error al cambiar vista:', error);
+        console.error('❌ Error cambio vista:', error);
     }
 }
 
@@ -406,7 +315,7 @@ function renderAssetList(categoryKey) {
         const titleContainer = document.getElementById('asset-list-title');
         
         if (!container) {
-            console.warn(`⚠️ Contenedor no encontrado: asset-list`);
+            console.warn(`⚠️ No encontrado: asset-list`);
             return;
         }
 
@@ -446,16 +355,13 @@ function renderAssetList(categoryKey) {
             container.appendChild(item);
         });
 
-        console.log(`✅ Lista de activos renderizada: ${categoryKey} (${assets.length} activos)`);
+        console.log(`✅ Lista: ${categoryKey} (${assets.length} activos)`);
 
     } catch (error) {
-        console.error('❌ Error al renderizar lista de activos:', error);
+        console.error('❌ Error lista:', error);
     }
 }
 
-// ==========================================
-// FUNCIÓN AUXILIAR: Buscar activo en todas las categorías
-// ==========================================
 function findAssetByName(assetName) {
     for (const category in marketData) {
         const asset = marketData[category].find(item => item.name === assetName);
@@ -464,12 +370,8 @@ function findAssetByName(assetName) {
     return null;
 }
 
-// ==========================================
-// CONFIGURACIÓN DE EVENT LISTENERS
-// ==========================================
 function setupEventListeners() {
     try {
-        // Botones de navegación lateral
         const navButtons = document.querySelectorAll('.sidebar-nav .nav-btn');
         navButtons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -487,12 +389,11 @@ function setupEventListeners() {
                         renderAssetList(viewType);
                     }
                 } catch (error) {
-                    console.error('Error en evento de navegación:', error);
+                    console.error('Error navegación:', error);
                 }
             });
         });
 
-        // Botón de vuelta atrás
         const backBtn = document.getElementById('btn-back-overview');
         if (backBtn) {
             backBtn.addEventListener('click', () => {
@@ -500,12 +401,11 @@ function setupEventListeners() {
                     switchView('overview');
                     renderAssetList('overview');
                 } catch (error) {
-                    console.error('Error en botón de retorno:', error);
+                    console.error('Error retorno:', error);
                 }
             });
         }
 
-        // Tarjetas de gráficos mini en el overview
         const overviewCards = document.querySelectorAll('.mini-chart-card');
         overviewCards.forEach(card => {
             card.addEventListener('click', (e) => {
@@ -515,7 +415,6 @@ function setupEventListeners() {
                         const heading = cardHeader.querySelector('h4');
                         if (heading) {
                             const name = heading.textContent.trim();
-                            // ✅ CORRECCIÓN: Buscar en TODAS las categorías, no solo en overview
                             const assetMatch = findAssetByName(name);
                             if (assetMatch) {
                                 updateTerminalAsset(assetMatch.symbol, assetMatch.name, assetMatch.flag);
@@ -523,14 +422,14 @@ function setupEventListeners() {
                         }
                     }
                 } catch (error) {
-                    console.error('Error en evento de tarjeta mini:', error);
+                    console.error('Error tarjeta:', error);
                 }
             });
         });
 
-        console.log('✅ Event listeners configurados correctamente');
+        console.log('✅ Listeners configurados');
 
     } catch (error) {
-        console.error('❌ Error al configurar event listeners:', error);
+        console.error('❌ Error listeners:', error);
     }
 }
