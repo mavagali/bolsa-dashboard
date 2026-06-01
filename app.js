@@ -5,12 +5,12 @@
 
 const marketData = {
     overview: [
-        { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "TVC:EU50", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "CAPITALCOM:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
+        { symbol: "CAPITALCOM:DE40", name: "EURO STOXX 50", flag: "🇪🇺" }, // Usamos el DE40/EU50 de réplica abierta
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "FOREXCOM:SPXUSD", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "FOREXCOM:NSXUSD", name: "NASDAQ 100", flag: "🇺🇸" },
-        { symbol: "TVC:UKX", name: "FTSE 100", flag: "🇬🇧" }
+        { symbol: "CURRENCYCOM:US500", name: "S&P 500", flag: "🇺🇸" },     // Réplica abierta indestructible del S&P500
+        { symbol: "CURRENCYCOM:US100", name: "NASDAQ 100", flag: "🇺🇸" },    // Réplica abierta indestructible del NASDAQ
+        { symbol: "CAPITALCOM:UK100", name: "FTSE 100", flag: "🇬🇧" }       // Corrección de símbolo incorrecto para el FTSE
     ],
     spain: [
         { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
