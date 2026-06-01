@@ -195,16 +195,15 @@ button {
     height: 7px;
     border-radius: 50%;
     display: inline-block;
+    background-color: var(--bearish); /* Por defecto cerrado */
+    transition: var(--transition-smooth);
 }
 
+/* Modificador dinámico controlado por JS para mercados abiertos */
 .status-dot.open {
-    background-color: var(--bullish);
+    background-color: var(--bullish) !important;
     box-shadow: 0 0 10px var(--bullish);
     animation: clock-pulse 2s infinite;
-}
-
-.status-dot.closed {
-    background-color: var(--bearish);
 }
 
 @keyframes clock-pulse {
@@ -341,11 +340,21 @@ button {
     border-color: var(--border-color-hover);
 }
 
-.asset-item-header {
+.asset-info-block {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 2px;
+    gap: 10px;
+}
+
+.asset-meta {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.asset-flag {
+    font-size: 18px;
+    flex-shrink: 0;
 }
 
 .asset-name {
@@ -355,19 +364,14 @@ button {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;
+    max-width: 170px;
 }
 
-.asset-symbol {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--text-muted);
-    font-family: monospace;
-}
-
-.asset-desc {
+.asset-ticker-sub {
     font-size: 11px;
     color: var(--text-muted);
+    font-family: monospace;
+    text-transform: uppercase;
 }
 
 /* Main Content Panel */
