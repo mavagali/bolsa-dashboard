@@ -135,12 +135,12 @@ function initGlobalWidgets() {
 
     // Cuadrícula de 5 Minigráficos (CORREGIDO: Símbolos espejo desbloqueados)
     const miniCharts = [
-        { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
-        { id: 'mini-stoxx', symbol: 'TVC:EU50' }, // Símbolo espejo libre
-        { id: 'mini-dax', symbol: 'XETR:DAX' },
-        { id: 'mini-spx', symbol: 'FOREXCOM:SPXUSD' }, // Símbolo espejo libre
-        { id: 'mini-nasdaq', symbol: 'FOREXCOM:NSXUSD' } // Símbolo espejo libre
-    ];
+    { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
+    { id: 'mini-stoxx', symbol: 'TVC:EU50' }, 
+    { id: 'mini-dax', symbol: 'XETR:DAX' },
+    { id: 'mini-spx', symbol: 'FOREXCOM:SPXUSD' }, 
+    { id: 'mini-nasdaq', symbol: 'FOREXCOM:NSXUSD' } 
+];
 
     miniCharts.forEach(chart => {
         loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
