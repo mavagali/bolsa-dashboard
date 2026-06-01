@@ -6,25 +6,25 @@
 const marketData = {
     overview: [
         { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "GLOBALPRIME:EU50", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "TVC:EU50", name: "EURO STOXX 50", flag: "🇪🇺" },
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "VANTAGE:SPX", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "NASDAQ:NDX", name: "NASDAQ 100", flag: "🇺🇸" },
+        { symbol: "FOREXCOM:SPXUSD", name: "S&P 500", flag: "🇺🇸" },
+        { symbol: "FOREXCOM:NSXUSD", name: "NASDAQ 100", flag: "🇺🇸" },
         { symbol: "TVC:UKX", name: "FTSE 100", flag: "🇬🇧" }
     ],
     spain: [
-        { symbol: "BMV:SAN", name: "Banco Santander", flag: "🇪🇸" },
-        { symbol: "BMV:BBVA", name: "BBVA", flag: "🇪🇸" },
-        { symbol: "BMV:TEF", name: "Telefónica", flag: "🇪🇸" },
-        { symbol: "BMV:ITX", name: "Inditex", flag: "🇪🇸" },
-        { symbol: "BMV:IBE", name: "Iberdrola", flag: "🇪🇸" },
-        { symbol: "BMV:REP", name: "Repsol", flag: "🇪🇸" }
+        { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
+        { symbol: "BME:BBVA", name: "BBVA", flag: "🇪🇸" },
+        { symbol: "BME:TEF", name: "Telefónica", flag: "🇪🇸" },
+        { symbol: "BME:ITX", name: "Inditex", flag: "🇪🇸" },
+        { symbol: "BME:IBE", name: "Iberdrola", flag: "🇪🇸" },
+        { symbol: "BME:REP", name: "Repsol", flag: "🇪🇸" }
     ],
     europe: [
         { symbol: "XETR:SAP", name: "SAP SE", flag: "🇩🇪" },
         { symbol: "MIL:RACE", name: "Ferrari NV", flag: "🇮🇹" },
-        { symbol: "Euronext:MC", name: "LVMH Moët Hennessy", flag: "🇫🇷" },
-        { symbol: "ASML:ASML", name: "ASML Holding", flag: "🇳🇱" },
+        { symbol: "EPA:MC", name: "LVMH", flag: "🇫🇷" },
+        { symbol: "AMS:ASML", name: "ASML Holding", flag: "🇳🇱" },
         { symbol: "XETR:SIE", name: "Siemens AG", flag: "🇩🇪" }
     ],
     america: [
@@ -32,7 +32,7 @@ const marketData = {
         { symbol: "NASDAQ:MSFT", name: "Microsoft Corp.", flag: "🇺🇸" },
         { symbol: "NASDAQ:NVDA", name: "NVIDIA Corp.", flag: "🇺🇸" },
         { symbol: "NASDAQ:TSLA", name: "Tesla Inc.", flag: "🇺🇸" },
-        { symbol: "NYSE:TRV", name: "The Travelers Companies", flag: "🇺🇸" }
+        { symbol: "NYSE:TRV", name: "Travelers", flag: "🇺🇸" }
     ]
 };
 
