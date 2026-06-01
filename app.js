@@ -455,6 +455,17 @@ function renderAssetList(categoryKey) {
 }
 
 // ==========================================
+// FUNCIÓN AUXILIAR: Buscar activo en todas las categorías
+// ==========================================
+function findAssetByName(assetName) {
+    for (const category in marketData) {
+        const asset = marketData[category].find(item => item.name === assetName);
+        if (asset) return asset;
+    }
+    return null;
+}
+
+// ==========================================
 // CONFIGURACIÓN DE EVENT LISTENERS
 // ==========================================
 function setupEventListeners() {
@@ -505,7 +516,8 @@ function setupEventListeners() {
                         const heading = cardHeader.querySelector('h4');
                         if (heading) {
                             const name = heading.textContent.trim();
-                            const assetMatch = marketData.overview.find(item => item.name === name);
+                            // ✅ CORRECCIÓN: Buscar en TODAS las categorías, no solo en overview
+                            const assetMatch = findAssetByName(name);
                             if (assetMatch) {
                                 updateTerminalAsset(assetMatch.symbol, assetMatch.name, assetMatch.flag);
                             }
