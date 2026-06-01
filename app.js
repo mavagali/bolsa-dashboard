@@ -4,7 +4,7 @@
  * 
  * Mejoras implementadas:
  * ✅ Validación completa de elementos DOM
- * ✅ Corrección del método de inyección de TradingView
+ * ✅ Corrección del método de inyección de TradingView (innerHTML en lugar de textContent)
  * ✅ Gestión adecuada de intervalos
  * ✅ Manejo de errores robusto
  * ✅ Colores RGBA completos
@@ -159,9 +159,8 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
         script.src = srcScript;
         script.async = true;
         
-        // ✅ CORRECCIÓN CRÍTICA: Usar textContent en lugar de innerHTML
-        // y pasar el JSON correctamente como contenido del script
-        script.textContent = JSON.stringify(settings);
+        // ✅ CORRECCIÓN CRÍTICA: Usar innerHTML para inyectar la configuración JSON
+        script.innerHTML = JSON.stringify(settings);
 
         // Manejo de errores de carga
         script.onerror = () => {
