@@ -167,22 +167,20 @@ function initGlobalWidgets() {
     });
 
     const miniCharts = [
-        { id: "mini-ibex", symbols: [["TVC:IBEX35", "IBEX 35"]] },
-        { id: "mini-stoxx", symbols: [["TVC:SX5E", "EURO STOXX 50"]] },
-        { id: "mini-dax", symbols: [["TVC:DAX", "DAX 40"]] },
-        { id: "mini-spx", symbols: [["FOREXCOM:SPXUSD", "S&P 500"]] },
-        { id: "mini-nasdaq", symbols: [["FOREXCOM:NSXUSD", "NASDAQ 100"]] }
+        { id: "mini-ibex", symbol: "TVC:IBEX35", title: "IBEX 35" },
+        { id: "mini-stoxx", symbol: "TVC:SX5E", title: "EURO STOXX 50" },
+        { id: "mini-dax", symbol: "TVC:DAX", title: "DAX 40" },
+        { id: "mini-spx", symbol: "FOREXCOM:SPXUSD", title: "S&P 500" },
+        { id: "mini-nasdaq", symbol: "FOREXCOM:NSXUSD", title: "NASDAQ 100" }
     ];
 
     miniCharts.forEach(chart => {
-        loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-            "symbols": chart.symbols,
-            "chartOnly": true,
+        loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js", {
+            "symbol": chart.symbol,
             "width": "100%",
             "height": "100%",
             "locale": "es",
             "colorTheme": "dark",
-            "autosize": true,
             "isTransparent": true
         });
     });
