@@ -5,11 +5,11 @@
 
 const marketData = {
     overview: [
-        { symbol: "CURRENCYCOM:SPA35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "CAPITALCOM:EU50", name: "EURO STOXX 50", flag: "🇪🇺" },
-        { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "CURRENCYCOM:US500", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "CURRENCYCOM:US100", name: "NASDAQ 100", flag: "🇺🇸" }
+        { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
+        { symbol: "TVC:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "TVC:DAX", name: "DAX 40", flag: "🇩🇪" },
+        { symbol: "FOREXCOM:SPXUSD", name: "S&P 500", flag: "🇺🇸" },
+        { symbol: "FOREXCOM:NSXUSD", name: "NASDAQ 100", flag: "🇺🇸" }
     ],
     spain: [
         { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
@@ -21,8 +21,8 @@ const marketData = {
     ],
     europe: [
         { symbol: "XETR:SAP", name: "SAP SE", flag: "🇩🇪" },
-        { symbol: "MIL:RACE", name: "Ferrari NV", flag: "🇮🇹" },
-        { symbol: "EPA:MC", name: "LVMH", flag: "🇫🇷" },
+        { symbol: "XMIL:RACE", name: "Ferrari NV", flag: "🇮🇹" },
+        { symbol: "EURONEXT:MC", name: "LVMH", flag: "🇫🇷" },
         { symbol: "AMS:ASML", name: "ASML Holding", flag: "🇳🇱" },
         { symbol: "XETR:SIE", name: "Siemens AG", flag: "🇩🇪" }
     ],
@@ -167,11 +167,11 @@ function initGlobalWidgets() {
     });
 
     const miniCharts = [
-        { id: "mini-ibex", symbols: [["CURRENCYCOM:SPA35", "IBEX 35"]] },
-        { id: "mini-stoxx", symbols: [["CAPITALCOM:EU50", "EURO STOXX 50"]] },
-        { id: "mini-dax", symbols: [["XETR:DAX", "DAX 40"]] },
-        { id: "mini-spx", symbols: [["CURRENCYCOM:US500", "S&P 500"]] },
-        { id: "mini-nasdaq", symbols: [["CURRENCYCOM:US100", "NASDAQ 100"]] }
+        { id: "mini-ibex", symbols: [["TVC:IBEX35", "IBEX 35"]] },
+        { id: "mini-stoxx", symbols: [["TVC:SX5E", "EURO STOXX 50"]] },
+        { id: "mini-dax", symbols: [["TVC:DAX", "DAX 40"]] },
+        { id: "mini-spx", symbols: [["FOREXCOM:SPXUSD", "S&P 500"]] },
+        { id: "mini-nasdaq", symbols: [["FOREXCOM:NSXUSD", "NASDAQ 100"]] }
     ];
 
     miniCharts.forEach(chart => {
