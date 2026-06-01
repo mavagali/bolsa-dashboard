@@ -210,3 +210,135 @@ function updateTerminalAsset(symbol, name, flag) {
         const checkTV = setInterval(() => {
             if (typeof TradingView !== 'undefined' && typeof TradingView.widget !== 'undefined') {
                 clearInterval(checkTV);
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": symbol,
+                    "interval": "D",
+                    "timezone": "Europe/Madrid",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "es",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_chart_real"
+                });
+            } else if (attempts > 20) {
+                clearInterval(checkTV);
+            }
+            attempts++;
+        }, 100);
+    }
+
+    loadTradingViewWidget("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
+        "interval": "1D",
+        "width": "100%",
+        "isTransparent": true,
+        "height": "100%",
+        "symbol": symbol,
+        "showIntervalTabs": true,
+        "locale": "es",
+        "colorTheme": "dark"
+    });
+
+    loadTradingViewWidget("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js", {
+        "symbol": symbol,
+        "width": "100%",
+        "height": "100%",
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "locale": "es"
+    });
+
+    switchView('terminal');
+}
+
+function switchView(viewName) {
+    const viewOverview = document.getElementById('view-overview');
+    const viewTerminal = document.getElementById('view-terminal');
+
+    if (viewName === 'overview') {
+        if (viewOverview) viewOverview.classList.add('active');
+        if (viewTerminal) viewTerminal.classList.remove('active');
+        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(btn => {
+            if (btn.getAttribute('data-view') === 'overview') btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+    } else {
+        if (viewOverview) viewOverview.classList.remove('active');
+        if (viewTerminal) viewTerminal.classList.add('active');
+    }
+}
+
+function renderAssetList(categoryKey) {
+    const container = document.getElementById('asset-list');
+    const titleContainer = document.getElementById('asset-list-title');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const titles = {
+        overview: "Índices Globales",
+        spain: "Acciones Continuo",
+        europe: "EuroZone Blue Chips",
+        america: "Wall Street List"
+    };
+    if (titleContainer) titleContainer.textContent = titles[categoryKey];
+
+    const assets = marketData[categoryKey] || [];
+    assets.forEach(asset => {
+        const item = document.createElement('div');
+        item.className = 'asset-item';
+        item.style.cursor = 'pointer';
+        item.innerHTML = `
+            <div class="asset-info-block">
+                <span class="asset-flag">${asset.flag}</span>
+                <div class="asset-meta">
+                    <span class="asset-name">${asset.name}</span>
+                    <span class="asset-ticker-sub">${asset.symbol.split(':').pop()}</span>
+                </div>
+            </div>
+        `;
+        item.addEventListener('click', () => updateTerminalAsset(asset.symbol, asset.name, asset.flag));
+        container.appendChild(item);
+    });
+}
+
+// Eventos de click
+var overviewCards = document.querySelectorAll('.mini-chart-card');
+function setupEventListeners() {
+    const navButtons = document.querySelectorAll('.sidebar-nav .nav-btn');
+    navButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            const currentBtn = e.currentTarget;
+            currentBtn.classList.add('active');
+            const viewType = currentBtn.getAttribute('data-view');
+            if (viewType === 'overview') {
+                switchView('overview');
+                renderAssetList('overview');
+            } else {
+                renderAssetList(viewType);
+            }
+        });
+    });
+
+    const backBtn = document.getElementById('btn-back-overview');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            switchView('overview');
+            renderAssetList('overview');
+        });
+    }
+
+    overviewCards = document.querySelectorAll('.mini-chart-card');
+    overviewCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            const cardHeader = e.currentTarget.querySelector('.card-header');
+            if (cardHeader) {
+                const name = cardHeader.querySelector('h4').textContent.trim();
+                const assetMatch = marketData.overview.find(item => item.name === name);
+                if (assetMatch) updateTerminalAsset(assetMatch.symbol, assetMatch.name, assetMatch.flag);
+            }
+        });
+    });
+}
