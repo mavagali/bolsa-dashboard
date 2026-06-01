@@ -1,16 +1,16 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - FINAL Y ESTABLE (Híbrida)
+ * Versión 2026 - Versión Indestructible (Desbloqueo de Gráficos de Visión General)
  */
 
 const marketData = {
     overview: [
-        { symbol: "CAPITALCOM:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "CAPITALCOM:DE40", name: "EURO STOXX 50", flag: "🇪🇺" }, // Usamos el DE40/EU50 de réplica abierta
+        { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
+        { symbol: "INDEX:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "CURRENCYCOM:US500", name: "S&P 500", flag: "🇺🇸" },     // Réplica abierta indestructible del S&P500
-        { symbol: "CURRENCYCOM:US100", name: "NASDAQ 100", flag: "🇺🇸" },    // Réplica abierta indestructible del NASDAQ
-        { symbol: "CAPITALCOM:UK100", name: "FTSE 100", flag: "🇬🇧" }       // Corrección de símbolo incorrecto para el FTSE
+        { symbol: "SP:SPX", name: "S&P 500", flag: "🇺🇸" },
+        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" },
+        { symbol: "INDEX:UKX", name: "FTSE 100", flag: "🇬🇧" }
     ],
     spain: [
         { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
@@ -36,22 +36,16 @@ const marketData = {
     ]
 };
 
-// ==========================================
-// 1. INICIALIZACIÓN
-// ==========================================
+// Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
     setupEventListeners();
-    
-    // Dejamos un pequeño margen para que el HTML se asiente antes de inyectar widgets
-    setTimeout(() => {
-        initGlobalWidgets();
-    }, 200);
+    initGlobalWidgets();
 });
 
 // ==========================================
-// 2. CONTROL DE RELOJES MUNDIALES (ESTABLES)
+// CONTROL DE RELOJES MUNDIALES
 // ==========================================
 function initClocks() {
     function updateTimes() {
@@ -98,13 +92,13 @@ function initClocks() {
 }
 
 // ==========================================
-// 3. INYECTOR DINÁMICO DE SCRIPTS (Antídoto 403)
+// INYECTOR DE SCRIPTS (MÉTODO SIN COMPRESIÓN)
 // ==========================================
 function loadTradingViewWidget(containerId, srcScript, settings) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    container.innerHTML = ''; // Limpiamos cualquier error previo
+    container.innerHTML = ''; 
 
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'tradingview-widget-container';
@@ -120,7 +114,7 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
     script.type = 'text/javascript';
     script.src = srcScript;
     script.async = true;
-    script.innerHTML = JSON.stringify(settings); // Fundamental: usar innerHTML aquí
+    script.innerHTML = JSON.stringify(settings);
 
     widgetContainer.appendChild(widgetLib);
     widgetContainer.appendChild(script);
@@ -128,10 +122,10 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
 }
 
 // ==========================================
-// 4. CARGA DE WIDGETS EN LA PANTALLA PRINCIPAL
+// CARGA DE WIDGETS GLOBALES (HOME)
 // ==========================================
 function initGlobalWidgets() {
-    // Ticker Tape Superior
+    // 1. Ticker Tape Superior
     loadTradingViewWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
         "symbols": [
             { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
@@ -147,32 +141,42 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
+    // 2. Cuadrícula de 6 Gráficos (CORREGIDO: Usando el script "symbol-overview" que no restringe índices)
     const miniCharts = [
-        { id: 'mini-ibex', symbol: 'CAPITALCOM:IBEX35' },
-        { id: 'mini-stoxx', symbol: 'CAPITALCOM:DE40' },
+        { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
+        { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
         { id: 'mini-dax', symbol: 'XETR:DAX' },
-        { id: 'mini-spx', symbol: 'CURRENCYCOM:US500' },
-        { id: 'mini-nasdaq', symbol: 'CURRENCYCOM:US100' },
-        { id: 'mini-ftse', symbol: 'CAPITALCOM:UK100' }
+        { id: 'mini-spx', symbol: 'SP:SPX' },
+        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
+        { id: 'mini-ftse', symbol: 'INDEX:UKX' }
     ];
 
     miniCharts.forEach(chart => {
-        loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js", {
-            "symbol": chart.symbol,
+        loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
+            "symbols": [[chart.symbol, chart.symbol]],
+            "chartOnly": true, // Oculta paneles de precios grandes para simular tu minigráfico original
             "width": "100%",
             "height": "100%",
-            "dateRange": "1M",
+            "locale": "es",
             "colorTheme": "dark",
-            "trendLineColor": "#2979ff",
-            "underLineColor": "rgba(41, 121, 255, 0.15)",
-            "underLineBottomColor": "rgba(41, 121, 255, 0)",
-            "isTransparent": true,
             "autosize": true,
-            "locale": "es"
+            "showVolume": false,
+            "showMA": false,
+            "hideDateProperties": false,
+            "hideMarketStatus": true,
+            "hideSymbolScale": true,
+            "scalePosition": "none",
+            "scaleMode": "Normal",
+            "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+            "fontSize": "10",
+            "trendLineColor": "#2979ff",
+            "underLineColor": "rgba(41, 121, 255, 0.12)",
+            "underLineBottomColor": "rgba(41, 121, 255, 0)",
+            "isTransparent": true
         });
     });
 
-    // Noticias
+    // 3. Noticias
     loadTradingViewWidget("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
         "feedMode": "all_symbols",
         "colorTheme": "dark",
@@ -183,7 +187,7 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // Calendario Económico
+    // 4. Calendario Económico
     loadTradingViewWidget("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
         "colorTheme": "dark",
         "isTransparent": true,
@@ -195,59 +199,50 @@ function initGlobalWidgets() {
 }
 
 // ==========================================
-// 5. VISTA DE DETALLE (TERMINAL INTERACTIVA)
+// DETALLE DE ACTIVO (VISTA TERMINAL)
 // ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
     document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // 1. EL GRÁFICO AVANZADO SÍ USA EL OBJETO OFICIAL
-    const chartBox = document.getElementById('tradingview_chart');
-    if (chartBox) {
-        chartBox.innerHTML = '<div id="tradingview_chart_real" style="width:100%; height:100%;"></div>';
-        
-        // Comprobación de seguridad por si tarda en cargar la librería principal
-        let attempts = 0;
-        const checkTV = setInterval(() => {
-            if (typeof TradingView !== 'undefined' && typeof TradingView.widget !== 'undefined') {
-                clearInterval(checkTV);
-                new TradingView.widget({
-                    "autosize": true,
-                    "symbol": symbol,
-                    "interval": "D",
-                    "timezone": "Europe/Madrid",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "es",
-                    "enable_publishing": false,
-                    "hide_side_toolbar": false,
-                    "allow_symbol_change": true,
-                    "container_id": "tradingview_chart_real"
-                });
-            } else if (attempts > 20) {
-                clearInterval(checkTV);
-            }
-            attempts++;
-        }, 100);
-    }
+    // Gráfico Avanzado Principal
+    loadTradingViewWidget("tradingview_chart", "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", {
+        "autosize": true,
+        "symbol": symbol,
+        "interval": "D",
+        "timezone": "Europe/Madrid",
+        "theme": "dark",
+        "style": "1",
+        "locale": "es",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "calendar": false,
+        "studies": [
+            "STD;RSI",
+            "STD;MA Simple"
+        ],
+        "support_host": "https://www.tradingview.com"
+    });
 
-    // 2. Los paneles de la derecha usan la inyección dinámica segura
+    // Widget Técnico (Gauge)
     loadTradingViewWidget("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
         "interval": "1D",
         "width": "100%",
         "isTransparent": true,
-        "height": "100%",
+        "height": "93%",
         "symbol": symbol,
         "showIntervalTabs": true,
         "locale": "es",
         "colorTheme": "dark"
     });
 
+    // Perfil Corporativo
     loadTradingViewWidget("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js", {
         "symbol": symbol,
         "width": "100%",
-        "height": "100%",
+        "height": "90%",
         "colorTheme": "dark",
         "isTransparent": true,
         "locale": "es"
@@ -256,23 +251,20 @@ function updateTerminalAsset(symbol, name, flag) {
     switchView('terminal');
 }
 
-// ==========================================
-// 6. NAVEGACIÓN Y LISTENERS
-// ==========================================
 function switchView(viewName) {
     const viewOverview = document.getElementById('view-overview');
     const viewTerminal = document.getElementById('view-terminal');
 
     if (viewName === 'overview') {
-        if (viewOverview) viewOverview.classList.add('active');
-        if (viewTerminal) viewTerminal.classList.remove('active');
+        viewOverview.classList.add('active');
+        viewTerminal.classList.remove('active');
         document.querySelectorAll('.sidebar-nav .nav-btn').forEach(btn => {
             if (btn.getAttribute('data-view') === 'overview') btn.classList.add('active');
             else btn.classList.remove('active');
         });
     } else {
-        if (viewOverview) viewOverview.classList.remove('active');
-        if (viewTerminal) viewTerminal.classList.add('active');
+        viewOverview.classList.remove('active');
+        viewTerminal.classList.add('active');
     }
 }
 
