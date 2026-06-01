@@ -124,7 +124,7 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
 // CARGA DE WIDGETS GLOBALES (HOME)
 // ==========================================
 function initGlobalWidgets() {
-    // 1. Ticker Tape Superior
+    // Ticker Tape Superior
     loadTradingViewWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
         "symbols": [
             { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
@@ -140,8 +140,6 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 2. Gráficos de la Cuadrícula Principal (Nativos e Individuales)
-    
     // Tarjeta IBEX 35
     loadTradingViewWidget("mini-ibex", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
         "symbols": [["CURRENCYCOM:SPA35", "IBEX 35"]],
@@ -172,7 +170,7 @@ function initGlobalWidgets() {
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
-    // 3. Panel de Noticias
+    // Panel de Noticias
     loadTradingViewWidget("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
         "feedMode": "all_symbols",
         "colorTheme": "dark",
@@ -183,7 +181,7 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 4. Panel de Calendario Económico
+    // Panel de Calendario Económico
     loadTradingViewWidget("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
         "colorTheme": "dark",
         "isTransparent": true,
