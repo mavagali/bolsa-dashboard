@@ -363,10 +363,23 @@ function renderAssetList(categoryKey) {
 }
 
 function findAssetByName(assetName) {
+    // Normalizar la búsqueda: eliminar espacios extra y convertir a minúsculas
+    const normalizedSearch = assetName.trim().toLowerCase();
+    
+    console.log(`🔍 Buscando activo: "${assetName}" (normalizado: "${normalizedSearch}")`);
+    
     for (const category in marketData) {
-        const asset = marketData[category].find(item => item.name === assetName);
-        if (asset) return asset;
+        const asset = marketData[category].find(item => 
+            item.name.trim().toLowerCase() === normalizedSearch
+        );
+        if (asset) {
+            console.log(`✅ Activo encontrado en ${category}: ${asset.name} (${asset.symbol})`);
+            return asset;
+        }
     }
+    
+    console.warn(`⚠️ Activo NO encontrado: "${assetName}". Imprimiendo disponibles:`);
+    console.table(marketData);
     return null;
 }
 
@@ -414,10 +427,15 @@ function setupEventListeners() {
                     if (cardHeader) {
                         const heading = cardHeader.querySelector('h4');
                         if (heading) {
-                            const name = heading.textContent.trim();
+                            const name = heading.textContent;
+                            console.log(`📌 Tarjeta clickeada. Texto extraído: "${name}" (length: ${name.length})`);
+                            
                             const assetMatch = findAssetByName(name);
                             if (assetMatch) {
+                                console.log(`📊 Cargando: ${assetMatch.symbol}`);
                                 updateTerminalAsset(assetMatch.symbol, assetMatch.name, assetMatch.flag);
+                            } else {
+                                console.error(`❌ No se encontró activo para: "${name}"`);
                             }
                         }
                     }
