@@ -147,14 +147,13 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // Cuadrícula de 6 Minigráficos
     const miniCharts = [
-        { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
-        { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
+        { id: 'mini-ibex', symbol: 'CAPITALCOM:IBEX35' },
+        { id: 'mini-stoxx', symbol: 'CAPITALCOM:DE40' },
         { id: 'mini-dax', symbol: 'XETR:DAX' },
-        { id: 'mini-spx', symbol: 'SP:SPX' },
-        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
-        { id: 'mini-ftse', symbol: 'INDEX:UKX' }
+        { id: 'mini-spx', symbol: 'CURRENCYCOM:US500' },
+        { id: 'mini-nasdaq', symbol: 'CURRENCYCOM:US100' },
+        { id: 'mini-ftse', symbol: 'CAPITALCOM:UK100' }
     ];
 
     miniCharts.forEach(chart => {
