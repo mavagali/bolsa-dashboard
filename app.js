@@ -1,6 +1,6 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - Corrección Nativa y Estable
+ * Versión 2026 - Versión Corregida de Alta Compatibilidad
  */
 
 const marketData = {
@@ -36,24 +36,15 @@ const marketData = {
     ]
 };
 
-// Arrancar la aplicación de manera segura
 document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
     setupEventListeners();
-    
-    // Esperamos 1 segundo para asegurar que la librería externa de TradingView está lista en el navegador
-    setTimeout(() => {
-        if (typeof TradingView !== 'undefined') {
-            initGlobalWidgets();
-        } else {
-            console.error("La librería de TradingView no se ha descargado a tiempo.");
-        }
-    }, 1000);
+    initGlobalWidgets(); // Cargamos los componentes nativos inmediatamente
 });
 
 // ==========================================
-// CONTROL DE RELOJES MUNDIALES
+// CONTROL DE RELOJES MUNDIALES (CON LEDS)
 // ==========================================
 function initClocks() {
     function updateTimes() {
@@ -86,7 +77,6 @@ function initClocks() {
                     const day = localDate.getDay();
                     const hours = localDate.getHours() + (localDate.getMinutes() / 60);
 
-                    // Abierto de lunes (1) a viernes (5) en sus horas de mercado
                     if (day >= 1 && day <= 5 && hours >= clock.openHour && hours <= clock.closeHour) {
                         dotElement.classList.add('open');
                     } else {
@@ -101,28 +91,16 @@ function initClocks() {
 }
 
 // ==========================================
-// CARGA DE WIDGETS CON EL MÉTODO OFICIAL
+// INYECCIÓN DE COMPONENTES POR IFRAME SEGURO
 // ==========================================
 function initGlobalWidgets() {
-    // 1. Ticker Tape (Cinta superior corrediza)
-    if (document.getElementById("tradingview-ticker-tape")) {
-        new TradingView.widget({
-            "container_id": "tradingview-ticker-tape",
-            "symbols": [
-                { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
-                { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100" },
-                { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
-                { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" }
-            ],
-            "showSymbolLogo": true,
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "displayMode": "adaptive",
-            "locale": "es"
-        });
+    // 1. Ticker Tape (Cinta corrediza)
+    const tapeContainer = document.getElementById("tradingview-ticker-tape");
+    if (tapeContainer) {
+        tapeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/ticker-tape/?locale=es&theme=dark&symbols=%5B%7B%22proName%22%3A%22FOREXCOM%3ASPXUSD%22%2C%22title%22%3A%22S%26P+500%22%7D%2C%7B%22proName%22%3A%22FOREXCOM%3ANSXUSD%22%2C%22title%22%3A%22Nasdaq+100%22%7D%2C%7B%22proName%22%3A%22FX_IDC%3AEURUSD%22%2C%22title%22%3A%22EUR%2FUSD%22%7D%2C%7B%22proName%22%3A%22BITSTAMP%3ABTCUSD%22%2C%22title%22%3A%22Bitcoin%22%7D%5D" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
-    // 2. Gráficos de la cuadrícula general (Usamos el widget estándar adaptado a miniatura)
+    // 2. Minigráficos de la cuadrícula general
     const miniCharts = [
         { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
         { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
@@ -133,88 +111,62 @@ function initGlobalWidgets() {
     ];
 
     miniCharts.forEach(chart => {
-        if (document.getElementById(chart.id)) {
-            new TradingView.widget({
-                "autosize": true,
-                "symbol": chart.symbol,
-                "interval": "D",
-                "timezone": "Europe/Madrid",
-                "theme": "dark",
-                "style": "3", // Estilo de área/línea limpia
-                "locale": "es",
-                "container_id": chart.id,
-                "hide_top_toolbar": true,
-                "hide_legend": true,
-                "disabled_features": ["header_widget", "left_toolbar", "timeframes_filter", "volume_force_overlay"]
-            });
+        const container = document.getElementById(chart.id);
+        if (container) {
+            container.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/mini-symbol-overview/?locale=es&theme=dark&symbol=${encodeURIComponent(chart.symbol)}&trendLineColor=%232979ff&underLineColor=rgba(41%2C+121%2C+255%2C+0.15)&underLineBottomColor=rgba(41%2C+121%2C+255%2C+0)" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
         }
     });
 
-    // 3. Noticias de mercados
-    if (document.getElementById("news-timeline-container")) {
-        new TradingView.widget({
-            "container_id": "news-timeline-container",
-            "feedMode": "all_symbols",
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "displayMode": "regular",
-            "width": "100%",
-            "height": "100%",
-            "locale": "es"
-        });
+    // 3. Noticias en tiempo real
+    const newsContainer = document.getElementById("news-timeline-container");
+    if (newsContainer) {
+        newsContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/timeline/?locale=es&theme=dark&feedMode=all_symbols" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
     // 4. Calendario Económico
-    if (document.getElementById("economic-calendar-container")) {
-        new TradingView.widget({
-            "container_id": "economic-calendar-container",
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "width": "100%",
-            "height": "100%",
-            "locale": "es",
-            "importanceFilter": "-1,0,1"
-        });
+    const calendarContainer = document.getElementById("economic-calendar-container");
+    if (calendarContainer) {
+        calendarContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/events/?locale=es&theme=dark&importanceFilter=-1%2C0%2C1" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 }
 
 // ==========================================
-// VISTA DETALLADA DE UN ACTIVO (TERMINAL)
+// VISTA INTERACTIVA (TERMINAL DE DETALLE)
 // ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
     document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // Gráfico Avanzado interactivo completo
+    // Aquí sí se usa de forma segura la librería nativa de tv.js instalada en el HTML
     const chartBox = document.getElementById('tradingview_chart');
     if (chartBox) {
         chartBox.innerHTML = '<div id="tradingview_chart_real" style="width:100%; height:100%;"></div>';
-        new TradingView.widget({
-            "autosize": true,
-            "symbol": symbol,
-            "interval": "D",
-            "timezone": "Europe/Madrid",
-            "theme": "dark",
-            "style": "1",
-            "locale": "es",
-            "enable_publishing": false,
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_chart_real"
-        });
+        if (typeof TradingView !== 'undefined') {
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Europe/Madrid",
+                "theme": "dark",
+                "style": "1",
+                "locale": "es",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart_real"
+            });
+        }
     }
 
-    // Nota: El gauge y el profile usan scripts de widgets que TradingView requiere embebidos.
-    // Para evitar que fallen al recargar, los inyectamos de forma limpia y controlada con iframes seguros.
     const gaugeContainer = document.getElementById('technical-analysis-container');
     if (gaugeContainer) {
-        gaugeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/technical-analysis/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:100%; border:none;"></iframe>`;
+        gaugeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/technical-analysis/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}&interval=1D" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
     const infoContainer = document.getElementById('symbol-info-container');
     if (infoContainer) {
-        infoContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/symbol-profile/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:100%; border:none;"></iframe>`;
+        infoContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/symbol-profile/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
     switchView('terminal');
@@ -306,30 +258,4 @@ function setupEventListeners() {
             }
         });
     });
-}// ==========================================
-// 2. INICIALIZACIÓN DE LA APLICACIÓN
-// ==========================================
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. Los relojes y la lista lateral arrancan al instante
-    initClocks();
-    renderAssetList('overview');
-    setupEventListeners();
-    
-    // 2. Comprobación inteligente de la librería externa de TradingView
-    let checkAttempts = 0;
-    const checkTradingViewReady = setInterval(() => {
-        checkAttempts++;
-        
-        // Si la librería ya está disponible en el navegador
-        if (typeof TradingView !== 'undefined' && typeof TradingView.widget !== 'undefined') {
-            clearInterval(checkTradingViewReady);
-            console.log("¡SDK de TradingView detectado con éxito!");
-            initGlobalWidgets();
-        } 
-        // Si tarda demasiado (más de 10 segundos), detenemos para no saturar
-        else if (checkAttempts > 40) {
-            clearInterval(checkTradingViewReady);
-            console.error("Error: La librería externa de TradingView tardó demasiado en responder.");
-        }
-    }, 250); // Comprueba cada 250 milisegundos de forma ultra-rápida
-});
+}
