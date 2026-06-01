@@ -4,20 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BolsaVision - Dashboard de Mercados Financieros</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232979ff'%3E%3Cpath d='M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.09-4-4L2 16.08l1.5 2.41z'/%3E%3C/svg%3E">
-    <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
-    <!-- TradingView Widget Library -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <!-- HEADER -->
         <header class="app-header">
             <div class="header-logo">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="logo-icon">
@@ -29,7 +24,6 @@
                 </div>
             </div>
             
-            <!-- Clocks Component -->
             <div class="market-clocks">
                 <div class="clock-item" id="clock-madrid">
                     <div class="clock-status">
@@ -55,14 +49,11 @@
             </div>
         </header>
 
-        <!-- TICKER TAPE -->
         <div class="ticker-tape-wrapper">
             <div id="tradingview-ticker-tape"></div>
         </div>
 
-        <!-- MAIN LAYOUT -->
         <div class="main-layout">
-            <!-- SIDEBAR -->
             <aside class="sidebar">
                 <div class="sidebar-section">
                     <h3 class="section-title">Navegación</h3>
@@ -88,18 +79,14 @@
                     </nav>
                 </div>
 
-                <!-- DYNAMIC ASSET LIST -->
                 <div class="sidebar-section">
                     <h3 class="section-title" id="asset-list-title">Índices y Acciones</h3>
                     <div class="asset-list" id="asset-list">
-                        <!-- Filled dynamically by JavaScript -->
-                    </div>
+                        </div>
                 </div>
             </aside>
 
-            <!-- CONTENT PANEL -->
             <main class="content-panel">
-                <!-- VIEW 1: OVERVIEW -->
                 <div class="view-container active" id="view-overview">
                     <div class="overview-grid">
                         <div class="grid-card mini-chart-card">
@@ -146,7 +133,6 @@
                         </div>
                     </div>
 
-                    <!-- Market Feed Widgets -->
                     <div class="overview-widgets">
                         <div class="grid-card news-card">
                             <div class="card-header border-bottom">
@@ -163,7 +149,6 @@
                     </div>
                 </div>
 
-                <!-- VIEW 2: TERMINAL (DETAIL) -->
                 <div class="view-container" id="view-terminal">
                     <div class="terminal-header">
                         <div class="terminal-title-area">
@@ -182,14 +167,11 @@
                     </div>
 
                     <div class="terminal-grid">
-                        <!-- Chart block -->
                         <div class="grid-card chart-card">
                             <div id="tradingview_chart"></div>
                         </div>
 
-                        <!-- Side details block -->
                         <div class="terminal-details-sidebar">
-                            <!-- Technical Gauge -->
                             <div class="grid-card gauge-card">
                                 <div class="card-header border-bottom">
                                     <h4>Análisis Técnico</h4>
@@ -197,7 +179,6 @@
                                 <div class="gauge-container" id="technical-analysis-container"></div>
                             </div>
 
-                            <!-- Symbol Profile -->
                             <div class="grid-card info-card">
                                 <div class="card-header border-bottom">
                                     <h4>Detalles del Símbolo</h4>
@@ -210,14 +191,12 @@
             </main>
         </div>
         
-        <!-- FOOTER -->
         <footer class="app-footer">
             <p>&copy; 2026 BolsaVision. Todos los datos están en tiempo real o con ligeros retrasos proporcionados por TradingView.</p>
             <p class="footer-github">Listo para hospedar en <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></p>
         </footer>
     </div>
 
-    <!-- Main JavaScript Logic -->
     <script src="app.js"></script>
 </body>
 </html>
