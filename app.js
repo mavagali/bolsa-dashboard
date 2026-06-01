@@ -38,15 +38,15 @@ function initGlobalWidgets() {
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
-    // Tarjeta S&P 500
+    // Tarjeta S&P 500 (Corregido con Feed Global Libre)
     loadTradingViewWidget("mini-spx", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
         "symbols": [["FOREXCOM:SPXUSD", "S&P 500"]],
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
-    // Tarjeta NASDAQ 100
+    // Tarjeta NASDAQ 100 (Corregido con Feed Global Libre)
     loadTradingViewWidget("mini-nasdaq", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["FOREXCOM:NSXUSD", "NASDAQ 100"]],
+        "symbols": [["CURRENCYCOM:US100", "NASDAQ 100"]],
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
