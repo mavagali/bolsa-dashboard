@@ -95,31 +95,100 @@ function initClocks() {
 function initGlobalWidgets() {
     if (typeof TradingView === 'undefined') return;
 
-    // Ticker Tape
-    new TradingView.widget({
-        "container_id": "tradingview-ticker-tape",
-        "symbols": [
-            { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
-            { "proName": "FOREXCOM:NSXUSD", "title": "US Tech 100" },
-            { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
-            { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" }
-        ],
-        "showSymbolLogo": true,
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "displayMode": "adaptive",
-        "locale": "es"
-    });
+    try {
+        // ==========================================================================
+        // TICKER TAPE (CORREGIDO: Inyección de Script Externo Oficial en Modo Oscuro)
+        // ==========================================================================
+        const tapeContainer = document.getElementById("tradingview-ticker-tape");
+        if (tapeContainer) {
+            tapeContainer.innerHTML = ''; // Limpiamos cualquier rastro del widget viejo blanco
+            
+            const tapeScript = document.createElement('script');
+            tapeScript.type = 'text/javascript';
+            tapeScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+            tapeScript.async = true;
+            tapeScript.innerHTML = JSON.stringify({
+                "symbols": [
+                    { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+                    { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100" },
+                    { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
+                    { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+                    { "proName": "TVC:IBEX35", "title": "IBEX 35" }
+                ],
+                "showSymbolLogo": true,
+                "colorTheme": "dark",
+                "isTransparent": true,
+                "displayMode": "adaptive",
+                "locale": "es"
+            });
+            tapeContainer.appendChild(tapeScript);
+        }
 
-    // Inyección de los 6 Minigráficos en los Cards
-    const miniCharts = [
-        { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
-        { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
-        { id: 'mini-dax', symbol: 'XETR:DAX' },
-        { id: 'mini-spx', symbol: 'SP:SPX' },
-        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
-        { id: 'mini-ftse', symbol: 'INDEX:UKX' }
-    ];
+        // ==========================================================================
+        // MINIGRÁFICOS EN LOS CARDS GENERALES
+        // ==========================================================================
+        const miniCharts = [
+            { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
+            { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
+            { id: 'mini-dax', symbol: 'XETR:DAX' },
+            { id: 'mini-spx', symbol: 'SP:SPX' },
+            { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
+            { id: 'mini-ftse', symbol: 'INDEX:UKX' }
+        ];
+
+        miniCharts.forEach(chart => {
+            const container = document.getElementById(chart.id);
+            if (container) {
+                container.innerHTML = '';
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "symbol": chart.symbol,
+                    "width": "100%",
+                    "height": "100%",
+                    "dateRange": "1M",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#2979ff",
+                    "underLineColor": "rgba(41, 121, 255, 0.15)",
+                    "underLineBottomColor": "rgba(41, 121, 255, 0)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "locale": "es"
+                });
+                container.appendChild(script);
+            }
+        });
+
+        // ==========================================================================
+        // NOTICIAS Y CALENDARIO ECONÓMICO
+        // ==========================================================================
+        new TradingView.widget({
+            "container_id": "news-timeline-container",
+            "feedMode": "all_symbols",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "displayMode": "regular",
+            "width": "100%",
+            "height": "100%",
+            "locale": "es"
+        });
+
+        new TradingView.widget({
+            "container_id": "economic-calendar-container",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "width": "100%",
+            "height": "100%",
+            "locale": "es",
+            "importanceFilter": "-1,0,1"
+        });
+
+    } catch (e) {
+        console.error("Error inicializando componentes TradingView:", e);
+    }
+}
 
     miniCharts.forEach(chart => {
         const container = document.getElementById(chart.id);
