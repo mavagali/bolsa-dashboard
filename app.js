@@ -1,6 +1,6 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - Versión Corregida de Alta Compatibilidad
+ * Versión 2026 - Edición Blindada Completa (Iframes Puros)
  */
 
 const marketData = {
@@ -36,15 +36,16 @@ const marketData = {
     ]
 };
 
+// Inicialización instantánea sin dependencias externas
 document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
     setupEventListeners();
-    initGlobalWidgets(); // Cargamos los componentes nativos inmediatamente
+    initGlobalWidgets();
 });
 
 // ==========================================
-// CONTROL DE RELOJES MUNDIALES (CON LEDS)
+// CONTROL DE RELOJES MUNDIALES (AUTÓNOMO)
 // ==========================================
 function initClocks() {
     function updateTimes() {
@@ -77,6 +78,7 @@ function initClocks() {
                     const day = localDate.getDay();
                     const hours = localDate.getHours() + (localDate.getMinutes() / 60);
 
+                    // Verde si es de lunes a viernes y el mercado está abierto
                     if (day >= 1 && day <= 5 && hours >= clock.openHour && hours <= clock.closeHour) {
                         dotElement.classList.add('open');
                     } else {
@@ -91,16 +93,16 @@ function initClocks() {
 }
 
 // ==========================================
-// INYECCIÓN DE COMPONENTES POR IFRAME SEGURO
+// INYECCIÓN DE WIDGETS DE LA HOME (IFRAMES)
 // ==========================================
 function initGlobalWidgets() {
-    // 1. Ticker Tape (Cinta corrediza)
+    // 1. Ticker Tape (Cinta superior)
     const tapeContainer = document.getElementById("tradingview-ticker-tape");
     if (tapeContainer) {
         tapeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/ticker-tape/?locale=es&theme=dark&symbols=%5B%7B%22proName%22%3A%22FOREXCOM%3ASPXUSD%22%2C%22title%22%3A%22S%26P+500%22%7D%2C%7B%22proName%22%3A%22FOREXCOM%3ANSXUSD%22%2C%22title%22%3A%22Nasdaq+100%22%7D%2C%7B%22proName%22%3A%22FX_IDC%3AEURUSD%22%2C%22title%22%3A%22EUR%2FUSD%22%7D%2C%7B%22proName%22%3A%22BITSTAMP%3ABTCUSD%22%2C%22title%22%3A%22Bitcoin%22%7D%5D" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
-    // 2. Minigráficos de la cuadrícula general
+    // 2. Cuadrícula de 6 Minigráficos
     const miniCharts = [
         { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
         { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
@@ -117,7 +119,7 @@ function initGlobalWidgets() {
         }
     });
 
-    // 3. Noticias en tiempo real
+    // 3. Noticias de Mercados
     const newsContainer = document.getElementById("news-timeline-container");
     if (newsContainer) {
         newsContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/timeline/?locale=es&theme=dark&feedMode=all_symbols" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
@@ -131,47 +133,37 @@ function initGlobalWidgets() {
 }
 
 // ==========================================
-// VISTA INTERACTIVA (TERMINAL DE DETALLE)
+// ACTUALIZACIÓN DE LA TERMINAL DE DETALLE (IFRAMES)
 // ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
     document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // Aquí sí se usa de forma segura la librería nativa de tv.js instalada en el HTML
+    // 1. Gráfico Avanzado interactivo cambiado a Iframe Nativo de TradingView (100% Fiable)
     const chartBox = document.getElementById('tradingview_chart');
     if (chartBox) {
-        chartBox.innerHTML = '<div id="tradingview_chart_real" style="width:100%; height:100%;"></div>';
-        if (typeof TradingView !== 'undefined') {
-            new TradingView.widget({
-                "autosize": true,
-                "symbol": symbol,
-                "interval": "D",
-                "timezone": "Europe/Madrid",
-                "theme": "dark",
-                "style": "1",
-                "locale": "es",
-                "enable_publishing": false,
-                "hide_side_toolbar": false,
-                "allow_symbol_change": true,
-                "container_id": "tradingview_chart_real"
-            });
-        }
+        chartBox.innerHTML = `<iframe src="https://s3.tradingview.com/widgetembed/?frameElementId=tradingview_chart_real&symbol=${encodeURIComponent(symbol)}&interval=D&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Europe%2FMadrid&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=es" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
     }
 
+    // 2. Indicador Técnico (Ajustado el alto a 93% para quitar barra de scroll)
     const gaugeContainer = document.getElementById('technical-analysis-container');
     if (gaugeContainer) {
-        gaugeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/technical-analysis/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}&interval=1D" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
+        gaugeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/technical-analysis/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}&interval=1D" style="width:100%; height:93%; border:none; overflow:hidden;"></iframe>`;
     }
 
+    // 3. Detalles de Perfil de Empresa (Ajustado el alto a 90% para quitar barra de scroll)
     const infoContainer = document.getElementById('symbol-info-container');
     if (infoContainer) {
-        infoContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/symbol-profile/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
+        infoContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/symbol-profile/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:90%; border:none; overflow:hidden;"></iframe>`;
     }
 
     switchView('terminal');
 }
 
+// ==========================================
+// NAVEGACIÓN Y LISTENERS (MANTENIDOS IGUAL)
+// ==========================================
 function switchView(viewName) {
     const viewOverview = document.getElementById('view-overview');
     const viewTerminal = document.getElementById('view-terminal');
