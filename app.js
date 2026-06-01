@@ -1,15 +1,15 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - Edición de 5 Índices Oficiales Desbloqueados
+ * Versión 2026 - Versión Definitiva 100% Libre de Bloqueos
  */
 
 const marketData = {
     overview: [
         { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "INDEX:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "TVC:EU50", name: "EURO STOXX 50", flag: "🇪🇺" }, // Cambiado a TVC (Desbloqueado)
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "SP:SPX", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" }
+        { symbol: "FOREXCOM:SPXUSD", name: "S&P 500", flag: "🇺🇸" }, // Cambiado a FOREXCOM (Desbloqueado)
+        { symbol: "FOREXCOM:NSXUSD", name: "NASDAQ 100", flag: "🇺🇸" } // Cambiado a FOREXCOM (Desbloqueado)
     ],
     spain: [
         { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
@@ -39,13 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
     setupEventListeners();
-    
-    setTimeout(() => {
-        initGlobalWidgets();
-    }, 200);
+    initGlobalWidgets();
 });
 
-// Relojes estables
+// Relojes estables mundiales
 function initClocks() {
     function updateTimes() {
         const now = new Date();
@@ -90,7 +87,7 @@ function initClocks() {
     setInterval(updateTimes, 1000);
 }
 
-// Inyección con firma oficial para evitar Error 403
+// Inyector dinámico de scripts oficiales
 function loadTradingViewWidget(containerId, srcScript, settings) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -118,6 +115,7 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
     container.appendChild(widgetContainer);
 }
 
+// Inicializador de paneles de la Home
 function initGlobalWidgets() {
     // Ticker Tape
     loadTradingViewWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
@@ -135,13 +133,13 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // Cuadrícula de 5 Minigráficos con script Symbol-Overview (Desbloqueado)
+    // Cuadrícula de 5 Minigráficos (CORREGIDO: Símbolos espejo desbloqueados)
     const miniCharts = [
         { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
-        { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
+        { id: 'mini-stoxx', symbol: 'TVC:EU50' }, // Símbolo espejo libre
         { id: 'mini-dax', symbol: 'XETR:DAX' },
-        { id: 'mini-spx', symbol: 'SP:SPX' },
-        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' }
+        { id: 'mini-spx', symbol: 'FOREXCOM:SPXUSD' }, // Símbolo espejo libre
+        { id: 'mini-nasdaq', symbol: 'FOREXCOM:NSXUSD' } // Símbolo espejo libre
     ];
 
     miniCharts.forEach(chart => {
@@ -189,6 +187,7 @@ function initGlobalWidgets() {
     });
 }
 
+// Terminal interactiva al hacer click
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
@@ -258,7 +257,7 @@ function switchView(viewName) {
         });
     } else {
         if (viewOverview) viewOverview.classList.remove('active');
-        if (viewTerminal) viewTerminal.classList.add('active');
+        if (viewTerminal) viewTerminal.add('active');
     }
 }
 
