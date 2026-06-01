@@ -142,15 +142,15 @@ function initGlobalWidgets() {
 
     // 2. Gráficos de la Cuadrícula Principal (Nativos e Individuales)
     
-    // Tarjeta IBEX 35
+    // Tarjeta IBEX 35 (Corregido con Feed libre de Currency.com)
     loadTradingViewWidget("mini-ibex", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CAPITALCOM:IBEX35", "IBEX 35"]],
+        "symbols": [["CURRENCYCOM:SPA35", "IBEX 35"]],
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
-    // Tarjeta EURO STOXX 50
+    // Tarjeta EURO STOXX 50 (Corregido con Ticker oficial de Capital.com)
     loadTradingViewWidget("mini-stoxx", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
-        "symbols": [["CAPITALCOM:DE40", "EURO STOXX 50"]],
+        "symbols": [["CAPITALCOM:EU50", "EURO STOXX 50"]],
         "chartOnly": true, "width": "100%", "height": "100%", "locale": "es", "colorTheme": "dark", "autosize": true, "isTransparent": true, "trendLineColor": "#2979ff", "underLineColor": "rgba(41, 121, 255, 0.12)"
     });
 
