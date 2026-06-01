@@ -1,448 +1,365 @@
-/* ==========================================================================
-   BOLSA VISION - CORE APP LOGIC
-   ========================================================================== */
+/**
+ * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
+ * Versión 2026 - Corregida y Optimizada
+ */
 
-// 1. DATABASE: STOCK INDICES & KEY EQUITIES
-const MARKET_DATA = {
-    spain: {
-        title: "Bolsa Española",
-        flag: "🇪🇸",
-        items: [
-            { symbol: "TVC:IBEX35", name: "IBEX 35", desc: "Índice de referencia nacional (España)" },
-            { symbol: "BME:SAN", name: "Banco Santander", desc: "Grupo financiero diversificado" },
-            { symbol: "BME:BBVA", name: "BBVA", desc: "Servicios financieros internacionales" },
-            { symbol: "BME:IBE", name: "Iberdrola", desc: "Líder energético renovable" },
-            { symbol: "BME:ITX", name: "Inditex", desc: "Grupo multinacional de distribución de moda" },
-            { symbol: "BME:TEF", name: "Telefónica", desc: "Compañía global de telecomunicaciones" }
-        ]
-    },
-    europe: {
-        title: "Bolsas Europeas",
-        flag: "🇪🇺",
-        items: [
-            { symbol: "TVC:SX5E", name: "EURO STOXX 50", desc: "50 mayores blue-chips de la Eurozona" },
-            { symbol: "TVC:DEU40", name: "DAX 40", desc: "Índice principal alemán (Frankfurt)" },
-            { symbol: "TVC:PX1", name: "CAC 40", desc: "Índice principal francés (París)" },
-            { symbol: "TVC:UK100", name: "FTSE 100", desc: "Índice principal británico (Londres)" },
-            { symbol: "TVC:FTSEMIB", name: "FTSE MIB", desc: "Índice de referencia italiano (Milán)" }
-        ]
-    },
-    america: {
-        title: "Bolsas Americanas",
-        flag: "🇺🇸",
-        items: [
-            { symbol: "TVC:SPX", name: "S&P 500", desc: "500 mayores empresas de EE. UU. (Wall Street)" },
-            { symbol: "TVC:IXIC", name: "NASDAQ Composite", desc: "Índice del mercado tecnológico (EE. UU.)" },
-            { symbol: "TVC:DJI", name: "Dow Jones Industrial", desc: "30 principales empresas industriales de EE. UU." },
-            { symbol: "TVC:RUT", name: "Russell 2000", desc: "Índice de pequeña capitalización de EE. UU." }
-        ]
-    }
+// ==========================================
+// 1. CONFIGURACIÓN DE ACTIVOS Y MERCADOS
+// ==========================================
+const marketData = {
+    overview: [
+        { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
+        { symbol: "INDEX:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
+        { symbol: "SP:SPX", name: "S&P 500", flag: "🇺🇸" },
+        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" },
+        { symbol: "INDEX:UKX", name: "FTSE 100", flag: "🇬🇧" }
+    ],
+    spain: [
+        { symbol: "BMV:SAN", name: "Banco Santander", flag: "🇪🇸" },
+        { symbol: "BMV:BBVA", name: "BBVA", flag: "🇪🇸" },
+        { symbol: "BMV:TEF", name: "Telefónica", flag: "🇪🇸" },
+        { symbol: "BMV:ITX", name: "Inditex", flag: "🇪🇸" },
+        { symbol: "BMV:IBE", name: "Iberdrola", flag: "🇪🇸" },
+        { symbol: "BMV:REP", name: "Repsol", flag: "🇪🇸" }
+    ],
+    europe: [
+        { symbol: "XETR:SAP", name: "SAP SE", flag: "🇩🇪" },
+        { symbol: "MIL:RACE", name: "Ferrari NV", flag: "🇮🇹" },
+        { symbol: "Euronext:MC", name: "LVMH Moët Hennessy", flag: "🇫🇷" },
+        { symbol: "ASML:ASML", name: "ASML Holding", flag: "🇳🇱" },
+        { symbol: "XETR:SIE", name: "Siemens AG", flag: "🇩🇪" }
+    ],
+    america: [
+        { symbol: "NASDAQ:AAPL", name: "Apple Inc.", flag: "🇺🇸" },
+        { symbol: "NASDAQ:MSFT", name: "Microsoft Corp.", flag: "🇺🇸" },
+        { symbol: "NASDAQ:NVDA", name: "NVIDIA Corp.", flag: "🇺🇸" },
+        { symbol: "NASDAQ:TSLA", name: "Tesla Inc.", flag: "🇺🇸" },
+        { symbol: "NYSE:TRV", name: "The Travelers Companies", flag: "🇺🇸" }
+    ]
 };
 
-// 2. ACTIVE SYSTEM STATE
-let currentView = "overview"; // 'overview' | 'terminal'
-let activeCategory = "spain"; 
-let activeSymbol = "TVC:IBEX35";
-let activeName = "IBEX 35";
-let activeFlag = "🇪🇸";
-
-// 3. CORE INIT FUNCTION
+// ==========================================
+// 2. INICIALIZACIÓN DE LA APLICACIÓN
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    initApp();
+    initClocks();
+    renderAssetList('overview'); // Carga la lista lateral inicial
+    setupEventListeners();
+    
+    // Dejamos una pequeña pausa de 300ms para asegurar que tv.js en diferido se ha cargado en el navegador
+    setTimeout(() => {
+        initGlobalWidgets();
+    }, 3000);
 });
 
-function initApp() {
-    // Setup Clocks (run immediately and then every second)
-    updateClocks();
-    setInterval(updateClocks, 1000);
+// ==========================================
+// 3. CONTROL DE RELOJES MUNDIALES
+// ==========================================
+function initClocks() {
+    function updateTimes() {
+        const now = new Date();
+        const clocks = [
+            { id: 'clock-madrid', zone: 'Europe/Madrid', openHour: 9, closeHour: 17.5 },
+            { id: 'clock-london', zone: 'Europe/London', openHour: 8, closeHour: 16.5 },
+            { id: 'clock-newyork', zone: 'America/New_York', openHour: 9.5, closeHour: 16 }
+        ];
 
-    // Load static global widgets (Ticker Tape, Overview Mini-charts, News and Calendar)
-    loadTickerTape();
-    loadOverviewGridWidgets();
-    loadOverviewWidgets();
+        clocks.forEach(clock => {
+            const container = document.getElementById(clock.id);
+            if (container) {
+                // Generar hora en formato string
+                const timeString = now.toLocaleTimeString('es-ES', {
+                    timeZone: clock.zone,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                container.querySelector('.clock-time').textContent = timeString;
 
-    // Render initial sidebar (all combined index overview list)
-    renderSidebarList("overview");
+                // Extraer hora numérica decimal local de esa zona para saber si el mercado está abierto
+                const localDateStr = now.toLocaleString('en-US', { timeZone: clock.zone });
+                const localDate = new Date(localDateStr);
+                const day = localDate.getDay();
+                const hours = localDate.getHours() + (localDate.getMinutes() / 60);
 
-    // Setup navigation event listeners
-    setupEventListeners();
-}
-
-// 4. EVENT LISTENERS SETUP
-function setupEventListeners() {
-    // Navigation Tabs
-    const navButtons = document.querySelectorAll(".nav-btn");
-    navButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const targetView = btn.getAttribute("data-view");
-            
-            // Remove active classes
-            navButtons.forEach(b => b.classList.remove("active"));
-            
-            if (targetView === "overview") {
-                btn.classList.add("active");
-                switchToOverview();
-            } else {
-                btn.classList.add("active");
-                // Load default symbol for each category
-                const defaultSymbolMap = {
-                    spain: { sym: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-                    europe: { sym: "TVC:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
-                    america: { sym: "TVC:SPX", name: "S&P 500", flag: "🇺🇸" }
-                };
-                
-                const selectInfo = defaultSymbolMap[targetView];
-                activeCategory = targetView;
-                switchToTerminal(selectInfo.sym, selectInfo.name, selectInfo.flag);
+                const dot = container.querySelector('.status-dot');
+                // Abierto de Lunes a Viernes (1-5) dentro del horario comercial
+                if (day >= 1 && day <= 5 && hours >= clock.openHour && hours <= clock.closeHour) {
+                    dot.classList.add('open');
+                } else {
+                    dot.classList.remove('open');
+                }
             }
         });
-    });
-
-    // Back to Overview Button in Terminal Header
-    document.getElementById("btn-back-overview").addEventListener("click", () => {
-        // Toggle active button in sidebar
-        document.querySelectorAll(".nav-btn").forEach(btn => {
-            btn.classList.remove("active");
-        });
-        document.getElementById("btn-overview").classList.add("active");
-        switchToOverview();
-    });
-
-    // Make Overview Cards Clickable to Load detailed chart
-    const overviewGridCards = document.querySelectorAll(".mini-chart-card");
-    const overviewSymMap = [
-        { id: "mini-ibex", sym: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸", cat: "spain" },
-        { id: "mini-stoxx", sym: "TVC:SX5E", name: "EURO STOXX 50", flag: "🇪🇺", cat: "europe" },
-        { id: "mini-dax", sym: "TVC:DEU40", name: "DAX 40", flag: "🇩🇪", cat: "europe" },
-        { id: "mini-spx", sym: "TVC:SPX", name: "S&P 500", flag: "🇺🇸", cat: "america" },
-        { id: "mini-nasdaq", sym: "TVC:IXIC", name: "NASDAQ Composite", flag: "🇺🇸", cat: "america" },
-        { id: "mini-ftse", sym: "TVC:UK100", name: "FTSE 100", flag: "🇬🇧", cat: "europe" }
-    ];
-
-    overviewGridCards.forEach((card, index) => {
-        card.addEventListener("click", () => {
-            const symInfo = overviewSymMap[index];
-            activeCategory = symInfo.cat;
-            
-            // Set matching sidebar category as active
-            document.querySelectorAll(".nav-btn").forEach(btn => {
-                btn.classList.remove("active");
-                if (btn.getAttribute("data-view") === symInfo.cat) {
-                    btn.classList.add("active");
-                }
-            });
-
-            switchToTerminal(symInfo.sym, symInfo.name, symInfo.flag);
-        });
-    });
-}
-
-// 5. VIEW SWITCHING ROUTING
-function switchToOverview() {
-    currentView = "overview";
+    }
     
-    // Toggle DOM panels
-    document.getElementById("view-overview").classList.add("active");
-    document.getElementById("view-terminal").classList.remove("active");
-    
-    // Refresh Sidebar title & list
-    document.getElementById("asset-list-title").textContent = "Índices Principales";
-    renderSidebarList("overview");
+    updateTimes();
+    setInterval(updateTimes, 1000);
 }
 
-function switchToTerminal(symbol, name, flag) {
-    currentView = "terminal";
-    activeSymbol = symbol;
-    activeName = name;
-    activeFlag = flag;
-
-    // Toggle DOM panels
-    document.getElementById("view-overview").classList.remove("active");
-    document.getElementById("view-terminal").classList.add("active");
-
-    // Update Terminal Header Details
-    document.getElementById("active-symbol-flag").textContent = flag;
-    document.getElementById("active-symbol-title").textContent = name;
-    document.getElementById("active-symbol-ticker").textContent = symbol;
-
-    // Render sidebar specifically filtered
-    document.getElementById("asset-list-title").textContent = MARKET_DATA[activeCategory].title;
-    renderSidebarList(activeCategory);
-
-    // Load Widgets for this symbol
-    loadDetailedTerminalWidgets(symbol);
-}
-
-// 6. SIDEBAR POPULATOR
-function renderSidebarList(category) {
-    const listContainer = document.getElementById("asset-list");
-    listContainer.innerHTML = ""; // Clear list
-
-    let listItems = [];
-
-    if (category === "overview") {
-        // Combined key index items
-        listItems = [
-            { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸", desc: "Bolsa de Madrid", cat: "spain" },
-            { symbol: "TVC:SX5E", name: "EURO STOXX 50", flag: "🇪🇺", desc: "Eurozona", cat: "europe" },
-            { symbol: "TVC:DEU40", name: "DAX 40", flag: "🇩🇪", desc: "Bolsa de Frankfurt", cat: "europe" },
-            { symbol: "TVC:PX1", name: "CAC 40", flag: "🇫🇷", desc: "Bolsa de París", cat: "europe" },
-            { symbol: "TVC:UK100", name: "FTSE 100", flag: "🇬🇧", desc: "Bolsa de Londres", cat: "europe" },
-            { symbol: "TVC:SPX", name: "S&P 500", flag: "🇺🇸", desc: "Wall Street Index", cat: "america" },
-            { symbol: "TVC:IXIC", name: "NASDAQ Composite", flag: "🇺🇸", desc: "US Tech Index", cat: "america" },
-            { symbol: "TVC:DJI", name: "Dow Jones 30", flag: "🇺🇸", desc: "US Blue-chips", cat: "america" }
-        ];
-    } else {
-        // Items from the specific category list
-        const flag = MARKET_DATA[category].flag;
-        listItems = MARKET_DATA[category].items.map(item => ({
-            ...item,
-            flag: flag,
-            cat: category
-        }));
+// ==========================================
+// 4. RENDERS DE TRADINGVIEW FIJOS (HOME)
+// ==========================================
+function initGlobalWidgets() {
+    if (typeof TradingView === 'undefined') {
+        console.error("La librería de TradingView no se ha cargado correctamente.");
+        return;
     }
 
-    listItems.forEach(item => {
-        const itemEl = document.createElement("button");
-        itemEl.className = "asset-item";
-        if (currentView === "terminal" && item.symbol === activeSymbol) {
-            itemEl.classList.add("active");
-        }
+    try {
+        // Ticker Tape (Cinta superior corrediza)
+        new TradingView.widget({
+            "container_id": "tradingview-ticker-tape",
+            "symbols": [
+                { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+                { "proName": "FOREXCOM:NSXUSD", "title": "US Tech 100" },
+                { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
+                { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" }
+            ],
+            "showSymbolLogo": true,
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "displayMode": "adaptive",
+            "locale": "es"
+        });
 
-        itemEl.innerHTML = `
-            <div class="asset-item-header">
-                <span class="asset-name">${item.flag} ${item.name}</span>
-                <span class="asset-symbol">${item.symbol.split(':')[1] || item.symbol}</span>
-            </div>
-            <div class="asset-desc">${item.desc}</div>
-        `;
+        // Inyección nativa y segura para los 6 minigráficos de la cuadrícula principal
+        const miniCharts = [
+            { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
+            { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
+            { id: 'mini-dax', symbol: 'XETR:DAX' },
+            { id: 'mini-spx', symbol: 'SP:SPX' },
+            { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
+            { id: 'mini-ftse', symbol: 'INDEX:UKX' }
+        ];
 
-        itemEl.addEventListener("click", () => {
-            activeCategory = item.cat;
-            
-            // Set active category tab state
-            document.querySelectorAll(".nav-btn").forEach(btn => {
-                btn.classList.remove("active");
-                if (btn.getAttribute("data-view") === item.cat) {
-                    btn.classList.add("active");
-                }
-            });
-
-            // If switching from overview, toggle layout
-            if (currentView === "overview") {
-                switchToTerminal(item.symbol, item.name, item.flag);
-            } else {
-                // Update terminal details
-                activeSymbol = item.symbol;
-                activeName = item.name;
-                activeFlag = item.flag;
-                
-                document.getElementById("active-symbol-flag").textContent = item.flag;
-                document.getElementById("active-symbol-title").textContent = item.name;
-                document.getElementById("active-symbol-ticker").textContent = item.symbol;
-                
-                // Set active item state in sidebar
-                document.querySelectorAll(".asset-item").forEach(el => el.classList.remove("active"));
-                itemEl.classList.add("active");
-                
-                loadDetailedTerminalWidgets(item.symbol);
+        miniCharts.forEach(chart => {
+            const container = document.getElementById(chart.id);
+            if (container) {
+                container.innerHTML = ''; // Limpiamos contenedor
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "symbol": chart.symbol,
+                    "width": "100%",
+                    "height": "100%",
+                    "dateRange": "1M",
+                    "colorTheme": "dark",
+                    "trendLineColor": "#2979ff",
+                    "underLineColor": "rgba(41, 121, 255, 0.15)",
+                    "underLineBottomColor": "rgba(41, 121, 255, 0)",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "locale": "es"
+                });
+                container.appendChild(script);
             }
         });
 
-        listContainer.appendChild(itemEl);
-    });
-}
+        // Noticias del mercado en tiempo real
+        new TradingView.widget({
+            "container_id": "news-timeline-container",
+            "feedMode": "all_symbols",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "displayMode": "regular",
+            "width": "100%",
+            "height": "100%",
+            "locale": "es"
+        });
 
-// 7. WIDGET INJECTOR PATTERN
-function injectWidgetScript(containerId, scriptSrc, config) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    container.innerHTML = ''; // Clear prior content
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = scriptSrc;
-    script.async = true;
-    script.innerHTML = JSON.stringify(config);
-    container.appendChild(script);
-}
-
-// 8. SPECIFIC WIDGETS RENDERING
-function loadTickerTape() {
-    injectWidgetScript("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
-        "symbols": [
-            { "proName": "TVC:IBEX35", "title": "IBEX 35" },
-            { "proName": "TVC:SX5E", "title": "Euro Stoxx 50" },
-            { "proName": "TVC:DEU40", "title": "DAX 40" },
-            { "proName": "TVC:PX1", "title": "CAC 40" },
-            { "proName": "TVC:UK100", "title": "FTSE 100" },
-            { "proName": "TVC:SPX", "title": "S&P 500" },
-            { "proName": "TVC:IXIC", "title": "NASDAQ" },
-            { "proName": "TVC:DJI", "title": "Dow Jones" },
-            { "proName": "BME:SAN", "title": "Santander" },
-            { "proName": "BME:IBE", "title": "Iberdrola" }
-        ],
-        "showSymbolLogo": true,
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "displayMode": "adaptive",
-        "locale": "es"
-    });
-}
-
-function loadOverviewGridWidgets() {
-    const miniCharts = [
-        { id: "mini-ibex", symbol: "TVC:IBEX35" },
-        { id: "mini-stoxx", symbol: "TVC:SX5E" },
-        { id: "mini-dax", symbol: "TVC:DEU40" },
-        { id: "mini-spx", symbol: "TVC:SPX" },
-        { id: "mini-nasdaq", symbol: "TVC:IXIC" },
-        { id: "mini-ftse", symbol: "TVC:UK100" }
-    ];
-
-    miniCharts.forEach(chart => {
-        injectWidgetScript(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js", {
-            "symbol": chart.symbol,
+        // Calendario Económico mundial
+        new TradingView.widget({
+            "container_id": "economic-calendar-container",
+            "colorTheme": "dark",
+            "isTransparent": true,
             "width": "100%",
             "height": "100%",
             "locale": "es",
-            "dateRange": "12M",
-            "colorTheme": "dark",
-            "isTransparent": true,
-            "autosize": true,
-            "largeChartUrl": ""
+            "importanceFilter": "-1,0,1"
         });
-    });
+
+    } catch (e) {
+        console.error("Error cargando los widgets globales:", e);
+    }
 }
 
-function loadOverviewWidgets() {
-    // News Timeline Feed
-    injectWidgetScript("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
-        "feedMode": "all_symbols",
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "displayMode": "regular",
-        "width": "100%",
-        "height": "100%",
-        "locale": "es"
-    });
+// ==========================================
+// 5. CAMBIO DINÁMICO DE ACTIVOS (TERMINAL DE DETALLE)
+// ==========================================
+function updateTerminalAsset(symbol, name, flag) {
+    try {
+        // 1. Modificar textos de la cabecera de la terminal
+        document.getElementById('active-symbol-flag').textContent = flag;
+        document.getElementById('active-symbol-title').textContent = name;
+        document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // Economic Calendar Events
-    injectWidgetScript("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
-        "colorTheme": "dark",
-        "isTransparent": true,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "importanceFilter": "-1,0,1"
-    });
-}
-
-function loadDetailedTerminalWidgets(symbol) {
-    // 1. Render main Advanced Interactive Chart (using tv.js constructor)
-    renderAdvancedChart(symbol);
-
-    // 2. Render Technical Analysis Gauge
-    injectWidgetScript("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
-        "interval": "1D",
-        "width": "100%",
-        "isTransparent": true,
-        "height": "100%",
-        "symbol": symbol,
-        "showIntervalTabs": true,
-        "displayMode": "single",
-        "locale": "es",
-        "colorTheme": "dark"
-    });
-
-    // 3. Render Symbol Profile Information Widget
-    injectWidgetScript("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js", {
-        "symbol": symbol,
-        "width": "100%",
-        "height": "100%",
-        "locale": "es",
-        "colorTheme": "dark",
-        "isTransparent": true
-    });
-}
-
-function renderAdvancedChart(symbol) {
-    if (typeof TradingView !== 'undefined') {
+        // 2. Gráfico Avanzado interactivo principal
+        document.getElementById('tradingview_chart').innerHTML = '<div id="tradingview_chart_real"></div>';
         new TradingView.widget({
-            "width": "100%",
-            "height": "100%",
+            "autosize": true,
             "symbol": symbol,
             "interval": "D",
             "timezone": "Europe/Madrid",
             "theme": "dark",
             "style": "1",
             "locale": "es",
-            "toolbar_bg": "#0c0f1d",
             "enable_publishing": false,
             "hide_side_toolbar": false,
             "allow_symbol_change": true,
-            "container_id": "tradingview_chart"
+            "container_id": "tradingview_chart_real",
+            "studies": [
+                "RSI@tv-basicstudies",
+                "MASimple@tv-basicstudies"
+            ]
         });
-    } else {
-        // Retry shortly if tv.js script hasn't initialized fully
-        setTimeout(() => renderAdvancedChart(symbol), 100);
+
+        // 3. Widget del Reloj Técnico (Gauge)
+        const gaugeContainer = document.getElementById('technical-analysis-container');
+        gaugeContainer.innerHTML = '';
+        const gaugeScript = document.createElement('script');
+        gaugeScript.type = 'text/javascript';
+        gaugeScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+        gaugeScript.async = true;
+        gaugeScript.innerHTML = JSON.stringify({
+            "interval": "1D",
+            "width": "100%",
+            "isTransparent": true,
+            "height": "100%",
+            "symbol": symbol,
+            "showIntervalTabs": true,
+            "locale": "es",
+            "colorTheme": "dark"
+        });
+        gaugeContainer.appendChild(gaugeScript);
+
+        // 4. Perfil e Información de la Empresa
+        const infoContainer = document.getElementById('symbol-info-container');
+        infoContainer.innerHTML = '';
+        const infoScript = document.createElement('script');
+        infoScript.type = 'text/javascript';
+        infoScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
+        infoScript.async = true;
+        infoScript.innerHTML = JSON.stringify({
+            "symbol": symbol,
+            "width": "100%",
+            "height": "100%",
+            "colorTheme": "dark",
+            "isTransparent": true,
+            "locale": "es"
+        });
+        infoContainer.appendChild(infoScript);
+
+        // 5. Ejecutar la transición visual de la vista
+        switchView('terminal');
+    } catch (err) {
+        console.error("Error al actualizar la terminal:", err);
     }
 }
 
-// 9. REAL-TIME MARKET CLOCKS & STATE MANAGEMENT
-function updateClocks() {
-    const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+// ==========================================
+// 6. ENRUTADO Y NAVEGACIÓN INTERNA (VISTAS)
+// ==========================================
+function switchView(viewName) {
+    const viewOverview = document.getElementById('view-overview');
+    const viewTerminal = document.getElementById('view-terminal');
 
-    // Clocks
-    const clocks = [
-        { id: "clock-madrid", timeZone: "Europe/Madrid", type: "madrid" },
-        { id: "clock-london", timeZone: "Europe/London", type: "london" },
-        { id: "clock-newyork", timeZone: "America/New_York", type: "newyork" }
-    ];
+    if (viewName === 'overview') {
+        viewOverview.classList.add('active');
+        viewTerminal.classList.remove('active');
+        document.querySelectorAll('.sidebar-nav .nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-overview').classList.add('active');
+    } else if (viewName === 'terminal') {
+        viewOverview.classList.remove('active');
+        viewTerminal.classList.add('active');
+    }
+}
 
-    clocks.forEach(clock => {
-        const container = document.getElementById(clock.id);
-        if (!container) return;
+function renderAssetList(categoryKey) {
+    const container = document.getElementById('asset-list');
+    const titleContainer = document.getElementById('asset-list-title');
+    
+    if (!container) return;
+    container.innerHTML = '';
 
-        // Render current local time
-        const timeStr = new Date().toLocaleTimeString('es-ES', { ...timeOptions, timeZone: clock.timeZone });
-        container.querySelector(".clock-time").textContent = timeStr;
+    const titles = {
+        overview: "Índices Globales",
+        spain: "Acciones Continuo",
+        europe: "EuroZone Blue Chips",
+        america: "Wall Street List"
+    };
+    titleContainer.textContent = titles[categoryKey] || "Índices y Acciones";
 
-        // Determine Market Open Status
-        const open = isMarketOpen(clock.timeZone, clock.type);
-        const dot = container.querySelector(".status-dot");
+    const assets = marketData[categoryKey] || [];
+    
+    assets.forEach(asset => {
+        const item = document.createElement('div');
+        item.className = 'asset-item';
+        item.style.cursor = 'pointer';
+        item.innerHTML = `
+            <div class="asset-info-block">
+                <span class="asset-flag">${asset.flag}</span>
+                <div class="asset-meta">
+                    <span class="asset-name">${asset.name}</span>
+                    <span class="asset-ticker-sub">${asset.symbol.split(':').pop()}</span>
+                </div>
+            </div>
+        `;
         
-        if (open) {
-            dot.className = "status-dot open";
-        } else {
-            dot.className = "status-dot closed";
-        }
+        item.addEventListener('click', () => {
+            updateTerminalAsset(asset.symbol, asset.name, asset.flag);
+        });
+        
+        container.appendChild(item);
     });
 }
 
-function isMarketOpen(timeZone, marketType) {
-    const localDate = new Date(new Date().toLocaleString('en-US', { timeZone }));
-    const day = localDate.getDay();
-    const hours = localDate.getHours();
-    const minutes = localDate.getMinutes();
+// ==========================================
+// 7. MANEJO DE EVENTOS (LISTENERS)
+// ==========================================
+function setupEventListeners() {
+    const navButtons = document.querySelectorAll('.sidebar-nav .nav-btn');
+    navButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            const currentBtn = e.currentTarget;
+            currentBtn.classList.add('active');
 
-    // Weekend Check (0 = Sunday, 6 = Saturday)
-    if (day === 0 || day === 6) {
-        return false;
+            const viewType = currentBtn.getAttribute('data-view');
+            
+            if (viewType === 'overview') {
+                switchView('overview');
+                renderAssetList('overview');
+            } else {
+                renderAssetList(viewType);
+            }
+        });
+    });
+
+    const backBtn = document.getElementById('btn-back-overview');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            switchView('overview');
+            renderAssetList('overview');
+        });
     }
 
-    if (marketType === "madrid") {
-        // IBEX trading: Monday - Friday, 09:00 - 17:30 CET
-        return (hours === 9 && minutes >= 0) || (hours > 9 && hours < 17) || (hours === 17 && minutes <= 30);
-    } 
-    else if (marketType === "london") {
-        // LSE trading: Monday - Friday, 08:00 - 16:30 GMT/BST
-        return (hours === 8 && minutes >= 0) || (hours > 8 && hours < 16) || (hours === 16 && minutes <= 30);
-    } 
-    else if (marketType === "newyork") {
-        // NYSE/Nasdaq trading: Monday - Friday, 09:30 - 16:00 EST/EDT
-        return (hours === 9 && minutes >= 30) || (hours > 9 && hours < 16);
-    }
-
-    return false;
+    const overviewCards = document.querySelectorAll('.mini-chart-card');
+    overviewCards.forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+            const cardHeader = e.currentTarget.querySelector('.card-header');
+            const name = cardHeader.querySelector('h4').textContent;
+            const flag = cardHeader.querySelector('.flag').textContent;
+            
+            const assetMatch = marketData.overview.find(item => item.name === name);
+            if (assetMatch) {
+                updateTerminalAsset(assetMatch.symbol, assetMatch.name, assetMatch.flag);
+            }
+        });
+    });
 }
