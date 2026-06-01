@@ -6,11 +6,11 @@
 const marketData = {
     overview: [
         { symbol: "TVC:IBEX35", name: "IBEX 35", flag: "🇪🇸" },
-        { symbol: "INDEX:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
+        { symbol: "GLOBALPRIME:EU50", name: "EURO STOXX 50", flag: "🇪🇺" },
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
-        { symbol: "SP:SPX", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" },
-        { symbol: "INDEX:UKX", name: "FTSE 100", flag: "🇬🇧" }
+        { symbol: "VANTAGE:SPX", name: "S&P 500", flag: "🇺🇸" },
+        { symbol: "NASDAQ:NDX", name: "NASDAQ 100", flag: "🇺🇸" },
+        { symbol: "TVC:UKX", name: "FTSE 100", flag: "🇬🇧" }
     ],
     spain: [
         { symbol: "BMV:SAN", name: "Banco Santander", flag: "🇪🇸" },
