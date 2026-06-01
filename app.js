@@ -1,6 +1,6 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - Edición Blindada Completa (Iframes Puros)
+ * Versión 2026 - Edición Antidoto contra Error 403 (Widgets Oficiales)
  */
 
 const marketData = {
@@ -36,7 +36,6 @@ const marketData = {
     ]
 };
 
-// Inicialización instantánea sin dependencias externas
 document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
@@ -45,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// CONTROL DE RELOJES MUNDIALES (AUTÓNOMO)
+// CONTROL DE RELOJES MUNDIALES
 // ==========================================
 function initClocks() {
     function updateTimes() {
@@ -78,7 +77,6 @@ function initClocks() {
                     const day = localDate.getDay();
                     const hours = localDate.getHours() + (localDate.getMinutes() / 60);
 
-                    // Verde si es de lunes a viernes y el mercado está abierto
                     if (day >= 1 && day <= 5 && hours >= clock.openHour && hours <= clock.closeHour) {
                         dotElement.classList.add('open');
                     } else {
@@ -93,16 +91,53 @@ function initClocks() {
 }
 
 // ==========================================
-// INYECCIÓN DE WIDGETS DE LA HOME (IFRAMES)
+// INYECCIÓN DE SCRIPTS OFICIALES EMBEBIDOS
 // ==========================================
-function initGlobalWidgets() {
-    // 1. Ticker Tape (Cinta superior)
-    const tapeContainer = document.getElementById("tradingview-ticker-tape");
-    if (tapeContainer) {
-        tapeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/ticker-tape/?locale=es&theme=dark&symbols=%5B%7B%22proName%22%3A%22FOREXCOM%3ASPXUSD%22%2C%22title%22%3A%22S%26P+500%22%7D%2C%7B%22proName%22%3A%22FOREXCOM%3ANSXUSD%22%2C%22title%22%3A%22Nasdaq+100%22%7D%2C%7B%22proName%22%3A%22FX_IDC%3AEURUSD%22%2C%22title%22%3A%22EUR%2FUSD%22%7D%2C%7B%22proName%22%3A%22BITSTAMP%3ABTCUSD%22%2C%22title%22%3A%22Bitcoin%22%7D%5D" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
-    }
+function injectWidget(containerId, widgetUrl, configObject) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = ''; // Limpiar errores previos 403
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tradingview-widget-container';
+    wrapper.style.width = '100%';
+    wrapper.style.height = '100%';
+    
+    const widgetInner = document.createElement('div');
+    widgetInner.className = 'tradingview-widget-container__widget';
+    widgetInner.style.width = '100%';
+    widgetInner.style.height = '100%';
+    
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = widgetUrl;
+    script.async = true;
+    script.innerHTML = JSON.stringify(configObject);
+    
+    wrapper.appendChild(widgetInner);
+    wrapper.appendChild(script);
+    container.appendChild(wrapper);
+}
 
-    // 2. Cuadrícula de 6 Minigráficos
+function initGlobalWidgets() {
+    // 1. Ticker Tape Superior Corregido
+    injectWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
+        "symbols": [
+            { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+            { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100" },
+            { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
+            { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+            { "proName": "TVC:IBEX35", "title": "IBEX 35" }
+        ],
+        "showSymbolLogo": true,
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "locale": "es"
+    });
+
+    // 2. Cuadrícula de los 6 Minigráficos Corregida
     const miniCharts = [
         { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
         { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
@@ -113,71 +148,110 @@ function initGlobalWidgets() {
     ];
 
     miniCharts.forEach(chart => {
-        const container = document.getElementById(chart.id);
-        if (container) {
-            container.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/mini-symbol-overview/?locale=es&theme=dark&symbol=${encodeURIComponent(chart.symbol)}&trendLineColor=%232979ff&underLineColor=rgba(41%2C+121%2C+255%2C+0.15)&underLineBottomColor=rgba(41%2C+121%2C+255%2C+0)" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
-        }
+        injectWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js", {
+            "symbol": chart.symbol,
+            "width": "100%",
+            "height": "100%",
+            "dateRange": "1M",
+            "colorTheme": "dark",
+            "trendLineColor": "#2979ff",
+            "underLineColor": "rgba(41, 121, 255, 0.15)",
+            "underLineBottomColor": "rgba(41, 121, 255, 0)",
+            "isTransparent": true,
+            "autosize": true,
+            "locale": "es"
+        });
     });
 
-    // 3. Noticias de Mercados
-    const newsContainer = document.getElementById("news-timeline-container");
-    if (newsContainer) {
-        newsContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/timeline/?locale=es&theme=dark&feedMode=all_symbols" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
-    }
+    // 3. Noticias en Tiempo Real Corregidas
+    injectWidget("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
+        "feedMode": "all_symbols",
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "displayMode": "regular",
+        "width": "100%",
+        "height": "100%",
+        "locale": "es"
+    });
 
-    // 4. Calendario Económico
-    const calendarContainer = document.getElementById("economic-calendar-container");
-    if (calendarContainer) {
-        calendarContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/events/?locale=es&theme=dark&importanceFilter=-1%2C0%2C1" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
-    }
+    // 4. Calendario Económico Corregido
+    injectWidget("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "width": "100%",
+        "height": "100%",
+        "locale": "es",
+        "importanceFilter": "-1,0,1"
+    });
 }
 
 // ==========================================
-// ACTUALIZACIÓN DE LA TERMINAL DE DETALLE (IFRAMES)
+// DETALLE DE ACTIVO (VISTA TERMINAL)
 // ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
     document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // 1. Gráfico Avanzado interactivo cambiado a Iframe Nativo de TradingView (100% Fiable)
-    const chartBox = document.getElementById('tradingview_chart');
-    if (chartBox) {
-        chartBox.innerHTML = `<iframe src="https://s3.tradingview.com/widgetembed/?frameElementId=tradingview_chart_real&symbol=${encodeURIComponent(symbol)}&interval=D&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=dark&style=1&timezone=Europe%2FMadrid&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=es" style="width:100%; height:100%; border:none; overflow:hidden;"></iframe>`;
-    }
+    // Gráfico Avanzado Principal mediante Inyección Autorizada Oficial
+    injectWidget("tradingview_chart", "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", {
+        "autosize": true,
+        "symbol": symbol,
+        "interval": "D",
+        "timezone": "Europe/Madrid",
+        "theme": "dark",
+        "style": "1",
+        "locale": "es",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "calendar": false,
+        "studies": [
+            "STD;RSI",
+            "STD;MA Simple"
+        ],
+        "support_host": "https://www.tradingview.com"
+    });
 
-    // 2. Indicador Técnico (Ajustado el alto a 93% para quitar barra de scroll)
-    const gaugeContainer = document.getElementById('technical-analysis-container');
-    if (gaugeContainer) {
-        gaugeContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/technical-analysis/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}&interval=1D" style="width:100%; height:93%; border:none; overflow:hidden;"></iframe>`;
-    }
+    // Widget de Análisis Técnico (Gauge)
+    injectWidget("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
+        "interval": "1D",
+        "width": "100%",
+        "isTransparent": true,
+        "height": "93%",
+        "symbol": symbol,
+        "showIntervalTabs": true,
+        "locale": "es",
+        "colorTheme": "dark"
+    });
 
-    // 3. Detalles de Perfil de Empresa (Ajustado el alto a 90% para quitar barra de scroll)
-    const infoContainer = document.getElementById('symbol-info-container');
-    if (infoContainer) {
-        infoContainer.innerHTML = `<iframe src="https://s3.tradingview.com/embed-widget/symbol-profile/?locale=es&style=dark&symbol=${encodeURIComponent(symbol)}" style="width:100%; height:90%; border:none; overflow:hidden;"></iframe>`;
-    }
+    // Perfil Corporativo
+    injectWidget("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js", {
+        "symbol": symbol,
+        "width": "100%",
+        "height": "90%",
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "locale": "es"
+    });
 
     switchView('terminal');
 }
 
-// ==========================================
-// NAVEGACIÓN Y LISTENERS (MANTENIDOS IGUAL)
-// ==========================================
 function switchView(viewName) {
     const viewOverview = document.getElementById('view-overview');
     const viewTerminal = document.getElementById('view-terminal');
 
     if (viewName === 'overview') {
-        viewOverview.classList.add('active');
-        viewTerminal.classList.remove('active');
+        if (viewOverview) viewOverview.classList.add('active');
+        if (viewTerminal) viewTerminal.classList.remove('active');
         document.querySelectorAll('.sidebar-nav .nav-btn').forEach(btn => {
             if (btn.getAttribute('data-view') === 'overview') btn.classList.add('active');
             else btn.classList.remove('active');
         });
     } else {
-        viewOverview.classList.remove('active');
-        viewTerminal.classList.add('active');
+        if (viewOverview) viewOverview.classList.remove('active');
+        if (viewTerminal) viewTerminal.classList.add('active');
     }
 }
 
