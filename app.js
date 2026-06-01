@@ -1,6 +1,6 @@
 /**
  * BolsaVision - Lógica de Control de Widgets y Datos de Mercado
- * Versión 2026 - Versión Indestructible (Desbloqueo de Gráficos de Visión General)
+ * Versión 2026 - Edición de 5 Índices Oficiales Desbloqueados
  */
 
 const marketData = {
@@ -9,8 +9,7 @@ const marketData = {
         { symbol: "INDEX:SX5E", name: "EURO STOXX 50", flag: "🇪🇺" },
         { symbol: "XETR:DAX", name: "DAX 40", flag: "🇩🇪" },
         { symbol: "SP:SPX", name: "S&P 500", flag: "🇺🇸" },
-        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" },
-        { symbol: "INDEX:UKX", name: "FTSE 100", flag: "🇬🇧" }
+        { symbol: "NASDAQ:IXIC", name: "NASDAQ 100", flag: "🇺🇸" }
     ],
     spain: [
         { symbol: "BME:SAN", name: "Banco Santander", flag: "🇪🇸" },
@@ -36,17 +35,17 @@ const marketData = {
     ]
 };
 
-// Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", () => {
     initClocks();
     renderAssetList('overview');
     setupEventListeners();
-    initGlobalWidgets();
+    
+    setTimeout(() => {
+        initGlobalWidgets();
+    }, 200);
 });
 
-// ==========================================
-// CONTROL DE RELOJES MUNDIALES
-// ==========================================
+// Relojes estables
 function initClocks() {
     function updateTimes() {
         const now = new Date();
@@ -91,9 +90,7 @@ function initClocks() {
     setInterval(updateTimes, 1000);
 }
 
-// ==========================================
-// INYECTOR DE SCRIPTS (MÉTODO SIN COMPRESIÓN)
-// ==========================================
+// Inyección con firma oficial para evitar Error 403
 function loadTradingViewWidget(containerId, srcScript, settings) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -121,11 +118,8 @@ function loadTradingViewWidget(containerId, srcScript, settings) {
     container.appendChild(widgetContainer);
 }
 
-// ==========================================
-// CARGA DE WIDGETS GLOBALES (HOME)
-// ==========================================
 function initGlobalWidgets() {
-    // 1. Ticker Tape Superior
+    // Ticker Tape
     loadTradingViewWidget("tradingview-ticker-tape", "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js", {
         "symbols": [
             { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
@@ -141,20 +135,19 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 2. Cuadrícula de 6 Gráficos (CORREGIDO: Usando el script "symbol-overview" que no restringe índices)
+    // Cuadrícula de 5 Minigráficos con script Symbol-Overview (Desbloqueado)
     const miniCharts = [
         { id: 'mini-ibex', symbol: 'TVC:IBEX35' },
         { id: 'mini-stoxx', symbol: 'INDEX:SX5E' },
         { id: 'mini-dax', symbol: 'XETR:DAX' },
         { id: 'mini-spx', symbol: 'SP:SPX' },
-        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' },
-        { id: 'mini-ftse', symbol: 'INDEX:UKX' }
+        { id: 'mini-nasdaq', symbol: 'NASDAQ:IXIC' }
     ];
 
     miniCharts.forEach(chart => {
         loadTradingViewWidget(chart.id, "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js", {
             "symbols": [[chart.symbol, chart.symbol]],
-            "chartOnly": true, // Oculta paneles de precios grandes para simular tu minigráfico original
+            "chartOnly": true,
             "width": "100%",
             "height": "100%",
             "locale": "es",
@@ -167,8 +160,6 @@ function initGlobalWidgets() {
             "hideSymbolScale": true,
             "scalePosition": "none",
             "scaleMode": "Normal",
-            "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
-            "fontSize": "10",
             "trendLineColor": "#2979ff",
             "underLineColor": "rgba(41, 121, 255, 0.12)",
             "underLineBottomColor": "rgba(41, 121, 255, 0)",
@@ -176,7 +167,7 @@ function initGlobalWidgets() {
         });
     });
 
-    // 3. Noticias
+    // Noticias
     loadTradingViewWidget("news-timeline-container", "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js", {
         "feedMode": "all_symbols",
         "colorTheme": "dark",
@@ -187,7 +178,7 @@ function initGlobalWidgets() {
         "locale": "es"
     });
 
-    // 4. Calendario Económico
+    // Calendario
     loadTradingViewWidget("economic-calendar-container", "https://s3.tradingview.com/external-embedding/embed-widget-events.js", {
         "colorTheme": "dark",
         "isTransparent": true,
@@ -198,51 +189,54 @@ function initGlobalWidgets() {
     });
 }
 
-// ==========================================
-// DETALLE DE ACTIVO (VISTA TERMINAL)
-// ==========================================
 function updateTerminalAsset(symbol, name, flag) {
     document.getElementById('active-symbol-flag').textContent = flag;
     document.getElementById('active-symbol-title').textContent = name;
     document.getElementById('active-symbol-ticker').textContent = symbol;
 
-    // Gráfico Avanzado Principal
-    loadTradingViewWidget("tradingview_chart", "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", {
-        "autosize": true,
-        "symbol": symbol,
-        "interval": "D",
-        "timezone": "Europe/Madrid",
-        "theme": "dark",
-        "style": "1",
-        "locale": "es",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "calendar": false,
-        "studies": [
-            "STD;RSI",
-            "STD;MA Simple"
-        ],
-        "support_host": "https://www.tradingview.com"
-    });
+    const chartBox = document.getElementById('tradingview_chart');
+    if (chartBox) {
+        chartBox.innerHTML = '<div id="tradingview_chart_real" style="width:100%; height:100%;"></div>';
+        
+        let attempts = 0;
+        const checkTV = setInterval(() => {
+            if (typeof TradingView !== 'undefined' && typeof TradingView.widget !== 'undefined') {
+                clearInterval(checkTV);
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": symbol,
+                    "interval": "D",
+                    "timezone": "Europe/Madrid",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "es",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_chart_real"
+                });
+            } else if (attempts > 20) {
+                clearInterval(checkTV);
+            }
+            attempts++;
+        }, 100);
+    }
 
-    // Widget Técnico (Gauge)
     loadTradingViewWidget("technical-analysis-container", "https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js", {
         "interval": "1D",
         "width": "100%",
         "isTransparent": true,
-        "height": "93%",
+        "height": "100%",
         "symbol": symbol,
         "showIntervalTabs": true,
         "locale": "es",
         "colorTheme": "dark"
     });
 
-    // Perfil Corporativo
     loadTradingViewWidget("symbol-info-container", "https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js", {
         "symbol": symbol,
         "width": "100%",
-        "height": "90%",
+        "height": "100%",
         "colorTheme": "dark",
         "isTransparent": true,
         "locale": "es"
@@ -256,15 +250,15 @@ function switchView(viewName) {
     const viewTerminal = document.getElementById('view-terminal');
 
     if (viewName === 'overview') {
-        viewOverview.classList.add('active');
-        viewTerminal.classList.remove('active');
+        if (viewOverview) viewOverview.classList.add('active');
+        if (viewTerminal) viewTerminal.classList.remove('active');
         document.querySelectorAll('.sidebar-nav .nav-btn').forEach(btn => {
             if (btn.getAttribute('data-view') === 'overview') btn.classList.add('active');
             else btn.classList.remove('active');
         });
     } else {
-        viewOverview.classList.remove('active');
-        viewTerminal.classList.add('active');
+        if (viewOverview) viewOverview.classList.remove('active');
+        if (viewTerminal) viewTerminal.classList.add('active');
     }
 }
 
